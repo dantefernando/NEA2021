@@ -1,4 +1,10 @@
-# Input Example: 6, 4, 4, 7, 8, 10, 1
+# Made by Dante Fernando February 2021
+# https://github.com/dantefernando/NEA2021
+
+# for key, value in quantity_dict.items():
+#     print(key , ' == ', value)
+
+# Data Example: 6, 4, 4, 7, 8, 10, 1
 
 default_menu = ["1,5.50,All day (large),breakfast",
                 "2,3.50,All day (small),breakfast",
@@ -22,26 +28,77 @@ def change_menu_items():
     pass
 
 
-def get_order_data():  # Validates Order 
+def get_quantity(names):
+    elements_dict = dict()
+    for elem in names:  # Iterate over each element in list 
+        if elem in elements_dict:  # If element exists add 1 to value else stay at one
+            elements_dict[elem] += 1
+        else:
+            elements_dict[elem] = 1
+    elements_dict = { key:value for key, value in elements_dict.items()}
+    return elements_dict
+
+
+def get_totals(full_order):  # Calculates quantity and cost totals
+    prices = []
+    for index in range(1, len(full_order)):
+        item = full_order[index]  # Gets the Full item information
+        price = item[1]  # Gets the price only
+        prices.append(float(price))  # Converts the string price into a float and adds to prices. 
+    total_price = 0
+    for price in prices:  # Adds up the prices together
+        total_price += price  # **total price currently**
+
+    names = []
+    for index in range(1, len(full_order)):
+        item = full_order[index]  # Gets the Full item information
+        name = item[2]  # Gets name only of full item
+        names.append(name)
+    total_quantity = 0
+    quantity_dict = get_quantity(names)
+    for key, value in quantity_dict.items():
+        print(key , ' == ', value)
+        total_quantity += value  # **total quantity currently**
+        return total_price, total_quantity, quantity_dict
+
+
+def get_order(data, menu_file):  # Checks order with the existing menu list stored in "menu.txt"
+    full_order = []
+    table_num = f"Table #{data[0]}"
+    full_order.append(table_num)
+    tmp_order = ""
+    for i in range(1, len(data)):  # iterates over order input except for table num.
+        menu_num = data[i]  # set the menu_num to i (any number greater than index: 0)
+        for menu_item in menu_file:  # Searches for index num in menu_file
+            if menu_item[0] == menu_num:
+                tmp_order = menu_item
+                full_order.append(tmp_order)
+                break
+    total_price, total_quantity, quantity_dict = get_totals(full_order)  # Calculates quantity and cost totals.
+
+
+def get_order_input(menu_file):  # Validates Order 
     while True:
         data = input("\nType order here: ").split(",")
-        hasAlpha = ""
+        tmp_last_item = menu_file[len(menu_file) -  1]  # Assigns Last entry's index
+        last_item = tmp_last_item[0]                    # to "last_item"
+        invalid = ""
         for element in data:  # Takes each element in the array
-            if len(element) > 1:
+            if len(element) > len(last_item) or element.isnumeric() == False:
+                invalid = True  # ^If the digit length is greater than the digit length in the menu or is not integer
+            elif int(element) > int(last_item):  # If the element is numerically greater than the last item
                 invalid = True
-            for letter in element:  # Takes each letter in the element 
-                if letter.isalpha() == True:  # If the letter is a letter
-                    invalid = True           # then set hasAlpha to True
         if invalid:  # If there are letters or symbols in the input: 
             print("Your order has invalid characters, please try again.")
         else:
-            return data
+            break
+    get_order(data, menu_file)
 
 
-def main_menu():  # Main Menu, first menu that the user sees.
+def main_menu(menu_file):  # Main Menu, first menu that the user sees.
     print("--Main Menu--")
     menu = {
-        "1": [": Input order data", get_order_data],
+        "1": [": Input order data", get_order_input],
         "2": [": Change Menu Items", change_menu_items],
         "3": [": Finalize Order", finalize_order]
     }
@@ -62,7 +119,7 @@ def main_menu():  # Main Menu, first menu that the user sees.
             print("Invalid index")
     data = ""
     if index == 1:  # Get Order data
-        data = menu[str(index)][1]()
+        data = menu[str(index)][1](menu_file)
     elif index == 2:  # change_menu_items
         menu[str(index)][1]()
     else:
@@ -76,20 +133,24 @@ def check_file(default_menu):  # Checks for menu and Creates default_menu if doe
             menu_file = []
             for element in whole_file:
                 element = element.strip("\n")
+                element = element.split(",")
                 menu_file.append(element)
             file.close()
+            return menu_file
 
     except IOError:  # If menu.txt is not found, make a new file
         with open("menu.txt", "w") as file:  # Creates the file and writes default menu
             for line in default_menu:
                 file.write(f"{line}\n")
             file.close()
+        check_file(default_menu)
 
 
 def main():
-    check_file(default_menu)  # Checks for menu and Creates default_menu if doesn't exist.
-    main_menu()
+    menu_file = check_file(default_menu)  # Checks for menu and Creates default_menu if doesn't exist.
+    main_menu(menu_file)
 
 
 if __name__ == "__main__":
     main()
+
