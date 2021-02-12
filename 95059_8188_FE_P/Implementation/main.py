@@ -137,7 +137,6 @@ def check_file(default_menu):  # Checks for menu and Creates default_menu if doe
                 menu_file.append(element)
             file.close()
             return menu_file
-
     except IOError:  # If menu.txt is not found, make a new file
         with open("menu.txt", "w") as file:  # Creates the file and writes default menu
             for line in default_menu:
