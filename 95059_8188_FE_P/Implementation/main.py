@@ -1,8 +1,6 @@
 # Made by Dante Fernando February 2021
 # https://github.com/dantefernando/NEA2021
 
-# for key, value in quantity_dict.items():
-#     print(key , ' == ', value)
 
 # Data Example: 6, 4, 4, 7, 8, 10, 1
 
@@ -26,6 +24,12 @@ def finalize_order():
 
 def change_menu_items():
     pass
+
+
+def display_order(total_price, total_quantity, quantity_dict, table_num):
+    print(f"\nYour order for {table_num}: \n")
+    for key, value in quantity_dict.items():
+        print(key , ' == ', value)
 
 
 def get_quantity(names):
@@ -57,7 +61,6 @@ def get_totals(full_order):  # Calculates quantity and cost totals
     total_quantity = 0
     quantity_dict = get_quantity(names)
     for key, value in quantity_dict.items():
-        print(key , ' == ', value)
         total_quantity += value  # **total quantity currently**
     return total_price, total_quantity, quantity_dict
 
@@ -75,6 +78,7 @@ def get_order(data, menu_file):  # Checks order with the existing menu list stor
                 full_order.append(tmp_order)
                 break
     total_price, total_quantity, quantity_dict = get_totals(full_order)  # Calculates quantity and cost totals.
+    display_order(total_price, total_quantity, quantity_dict, table_num)
 
 
 def get_order_input(menu_file):  # Validates Order 
@@ -90,13 +94,15 @@ def get_order_input(menu_file):  # Validates Order
                 invalid = True
         if invalid:  # If there are letters or symbols in the input: 
             print("Your order has invalid characters, please try again.")
+        elif len(data) == 1:
+            print("At least one order must be made per table, please try again.")
         else:
             break
     get_order(data, menu_file)
 
 
 def main_menu(menu_file):  # Main Menu, first menu that the user sees.
-    print("--Main Menu--")
+    print("\n--Main Menu--")
     menu = {
         "1": [": Input order data", get_order_input],
         "2": [": Change Menu Items", change_menu_items],
