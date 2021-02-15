@@ -1,10 +1,6 @@
 # Made by Dante Fernando February 2021
 # https://github.com/dantefernando/NEA2021
 
-"""
-TODO LIST:
-- Print menu with titles before getting order input
-"""
 
 # Data Example: 6, 4, 4, 7, 8, 10, 1
 
@@ -94,7 +90,7 @@ def get_order_input(menu_file):  # Validates Order
         invalidTable = ""
         for index, element in enumerate(data):  # Takes each element in the array
             if index == 0:  # If the element is first (table number doesn't apply for these rules)
-                if element.isnumeric() == False:
+                if len(element) > 2 or element.isnumeric() == False:
                     invalid = True  # ^If the digit length is greater than 25 is not integer
                 elif int(element) > 25:  # If the element is numerically greater than number of tables in (25)
                     invalidTable = True
