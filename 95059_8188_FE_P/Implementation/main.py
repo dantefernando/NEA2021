@@ -1,12 +1,33 @@
 # Made by Dante Fernando February 2021
 # https://github.com/dantefernando/NEA2021
 
-"""
-TODO LIST:
-- Print menu with titles before getting order input
+
+from decimal import Decimal
+
+
 """
 
-# Data Example: 6, 4, 4, 7, 8, 10, 1
+TODO LIST:
+- Save the running totals to a file
+
+--------------------------------------------------
+
+- Allow the user to add, amend and delete menu items, and save menu changes
+
+- Allow the menu to be saved to a file
+
+--------------------------------------------------
+
+- Calculate the total cost of the order
+
+- Provide options to display the menu and running totals
+
+- Display the order details for printing
+
+- Loop for input of the next order
+--------------------------------------------------
+
+"""
 
 default_menu = ["1,5.50,All day (large),breakfast",
                 "2,3.50,All day (small),breakfast",
@@ -30,11 +51,16 @@ def change_menu_items():
     pass
 
 
+# Displays the current orders with the quantities of each menu item.
 def display_order(total_price, total_quantity, quantity_dict, table_num):
+    print("-" * 30)
     print(f"\nYour order for {table_num}: \n")
     for key, value in quantity_dict.items():
         print(key , ' == ', value)
-
+    print(f"\nTotal Price = ${total_price}")
+    print(f"Total Quantity of items ordered = {total_quantity}\n")
+    print("-" * 30)
+    print("\n")
 
 def get_quantity(names):
     elements_dict = dict()
@@ -53,9 +79,10 @@ def get_totals(full_order):  # Calculates quantity and cost totals
         item = full_order[index]  # Gets the Full item information
         price = item[1]  # Gets the price only
         prices.append(float(price))  # Converts the string price into a float and adds to prices. 
-    total_price = 0
+    total_price_tmp = 0
     for price in prices:  # Adds up the prices together
-        total_price += price  # **total price currently**
+        total_price_tmp += price  # **total price currently**
+    total_price = round(total_price_tmp,2)
 
     names = []
     for index in range(1, len(full_order)):
@@ -85,8 +112,47 @@ def get_order(data, menu_file):  # Checks order with the existing menu list stor
     display_order(total_price, total_quantity, quantity_dict, table_num)
 
 
+def print_menu(menu_file):
+    items = []
+    for element in menu_file:  # Takes menu_file items and strips them of the categoy e.g. "breakfast"
+        tmp = []
+        for index, el in enumerate(element):
+            if not index == 3:
+                tmp.append(el)
+        items.append(tmp)
+
+    tmp2 = []  # Finds which element in the array has the greatest amount of chars.
+    for element in items:
+        string = ""
+        for el in element:
+            string += el
+        tmp2.append(string)
+    max_len_el = max([len(i) for i in tmp2])
+    max_len = max_len_el + 5
+
+    real_output = []
+    for element in menu_file:  # Formats each menu item with the right amount of periods "."
+        number = element[0]
+        price = element[1]
+        name = element[2]
+        full_item_tmp = f"{number}. {name} {price}"
+        length_of_full = len(full_item_tmp)
+        period_num = max_len - length_of_full
+        periods = period_num * "."
+        full_item = f"{number}. {name} {periods} {price}"
+        real_output.append(full_item)
+    for item in real_output:
+        print(f"\n{item}")  # Prints all menu items formatted with perfect amount of periods.
+    print("\n")
+
+
 def get_order_input(menu_file):  # Validates Order 
+    print_menu(menu_file)
     while True:
+        print("-" * 30)
+        print("\nE.g. \"6, 4, 4, 7, 8, 10, 10\""
+              " Would be an order from Table 6 for 2 Burgers, 1 Fries, 1 Salad and 2 Soft"
+              " Drinks.")
         data = input("\nType order here: ").split(",")
         tmp_last_item = menu_file[len(menu_file) -  1]  # Assigns Last entry's index
         last_item = tmp_last_item[0]                    # to "last_item"
@@ -95,8 +161,8 @@ def get_order_input(menu_file):  # Validates Order
         for index, element in enumerate(data):  # Takes each element in the array
             if index == 0:  # If the element is first (table number doesn't apply for these rules)
                 if element.isnumeric() == False:
-                    invalid = True  # ^If the digit length is greater than 25 is not integer
-                elif int(element) > 25:  # If the element is numerically greater than number of tables in (25)
+                    invalid = True  # ^If the digit length is greater than 10 is not integer
+                elif int(element) > 10:  # If the element is numerically greater than number of tables in (10)
                     invalidTable = True
             else:
                 if len(element) > len(last_item) or element.isnumeric() == False:
@@ -104,18 +170,18 @@ def get_order_input(menu_file):  # Validates Order
                 elif int(element) > int(last_item):  # If the element is numerically greater than the last item
                     invalid = True
         if invalidTable:
-            print("We only have 25 tables! Table number must be lower than 25, please try again.")
+            print("\nWe only have 10 tables! Table number must be lower than 10, please try again.")
         elif invalid:  # If there are letters or symbols in the input: 
-            print("Your order has invalid characters, please try again.")
+            print("\nYour order has invalid characters, please try again.")
         elif len(data) == 1:
-            print("At least one order must be made per table, please try again.")
+            print("\nAt least one order must be made per table, please try again.")
         else:
             break
     get_order(data, menu_file)
 
 
 def main_menu(menu_file):  # Main Menu, first menu that the user sees.
-    print("\n--Main Menu--")
+    print("\n----------Main Menu-----------")
     menu = {
         "1": [": Input order data", get_order_input],
         "2": [": Change Menu Items", change_menu_items],
@@ -137,6 +203,7 @@ def main_menu(menu_file):  # Main Menu, first menu that the user sees.
         except ValueError:  # If it can't be converted to an integer
             print("Invalid index")
     data = ""
+    print("-" * 30)
     if index == 1:  # Get Order data
         data = menu[str(index)][1](menu_file)
     elif index == 2:  # change_menu_items
@@ -146,22 +213,23 @@ def main_menu(menu_file):  # Main Menu, first menu that the user sees.
 
 
 def check_file(default_menu):  # Checks for menu and Creates default_menu if doesn't exist.
-    try:  # Check for existing file by trying to read the file
-        with open("menu.txt", "r") as file:
-            whole_file = file.readlines()  # Stores the menu in the file as "whole_file"
-            menu_file = []
-            for element in whole_file:
-                element = element.strip("\n")
-                element = element.split(",")
-                menu_file.append(element)
-            file.close()
-            return menu_file
-    except IOError:  # If menu.txt is not found, make a new file
-        with open("menu.txt", "w") as file:  # Creates the file and writes default menu
-            for line in default_menu:
-                file.write(f"{line}\n")
-            file.close()
-        check_file(default_menu)
+    for i in range(2):  # Quick fix for the file not being read on first try idk.
+        try:  # Check for existing file by trying to read the file
+            with open("menu.txt", "r") as file:
+                whole_file = file.readlines()  # Stores the menu in the file as "whole_file"
+                menu_file = []
+                for element in whole_file:
+                    element = element.strip("\n")
+                    element = element.split(",")
+                    menu_file.append(element)
+                file.close()
+                return menu_file
+        except IOError:  # If menu.txt is not found, make a new file
+            with open("menu.txt", "w") as file:  # Creates the file and writes default menu
+                for line in default_menu:
+                    file.write(f"{line}\n")
+                file.close()
+            check_file(default_menu)
 
 
 def main():
