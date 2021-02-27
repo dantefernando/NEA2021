@@ -2,14 +2,9 @@
 # https://github.com/dantefernando/NEA2021
 
 
-from decimal import Decimal
-
-
 """
 
 TODO LIST:
-- Save the running totals to a file
-
 --------------------------------------------------
 
 - Allow the user to add, amend and delete menu items, and save menu changes
@@ -26,6 +21,8 @@ TODO LIST:
 
 - Loop for input of the next order
 --------------------------------------------------
+
+- When printing the menu, display when the file was made/last modified
 
 """
 
@@ -47,15 +44,105 @@ def finalize_order():
     pass
 
 
-def change_menu_items():
+# Allows user to delete menu items
+def delete_menu_items():
     pass
+
+
+# Allows user to edit menu items
+def edit_menu_items(menu_file):
+    pass
+    # max_index = len(menu_file)  # The highest index out of all the items on the menu list 
+
+
+# Allows user to add menu items to the menu
+def add_menu_items(menu_file):
+    print_menu(menu_file)
+
+    # User inputs category for new item 
+    categories = ["breakfast", "mains", "extras", "drinks"]
+    print("-" * 30)
+    while True:
+        print("Please choose the menu category of your new menu item:\n"
+              "Categories to choose from: Breakfast, Mains, Extras and drinks\n")
+        while True:
+            category = input("Your category: ").lower()
+            if not category in categories:
+                print("Please enter a valid category, try again.\n")
+            else:
+                break
+
+        # User inputs name for new item
+        print("-" * 30)
+        print("Please choose the name of your new menu item.\n")
+        while True:
+            name = input("Name of new menu item: ")
+            if name.isalpha() == False:
+                print("Name must contain alphabetic characters only, try again.\n")
+            else:
+                break
+
+        # User inputs price for new item
+        print("-" * 30)
+        print("Please choose the price of your new menu item.\n")
+        while True:
+            try:
+                price_unrounded = float(input("Price of new menu item: $"))
+                price = round(price_unrounded,2)  # Total price stored as a float 
+                break
+            except ValueError:
+                print("Please input numeric characters only, try again.\n")
+
+
+# Provides menu interface for user to choose to Add, edit or delete menu items
+def editing_main_menu(menu_file):  # Credits to github.com/RoyceLWC for Menu. 
+    print("\n-------Edit Menu Items--------")
+    menu = {
+        "1": [": Add menu items", add_menu_items],
+        "2": [": Edit an existing menu item", edit_menu_items],
+        "3": [": Delete menu items", delete_menu_items],
+        "4": [": Exit to main menu"]
+    }
+
+    # Prints each menu index and its corresponding functions description
+    for key in sorted(menu.keys()):
+        print(key + menu[key][0])
+
+    while True:  # Loop until a valid index is received
+        print("-" * 30)
+        index = input("Select an index: ")
+        try:  # Try to convert to an integer
+            index = int(index)  # Converts to an integer
+            if 1 <= index <= 4:  # In range
+                break
+            else:  # Out of range
+                print("Out of range try again!")
+        except ValueError:  # If it can't be converted to an integer
+            print("Invalid index")
+    print("-" * 30)
+    if index == 1:  # add_menu_items
+        menu[str(index)][1](menu_file)
+    elif index == 2:  # edit_menu_items
+        menu[str(index)][1](menu_file)
+    elif index == 3:  # delete_menu_items
+        menu[str(index)][1](menu_file)
+
+
+# Writes running totals to running_totals.txt
+def write_order(total_price, total_quantity, quantity_dict, table_num):
+    with open("running_totals.txt", "w") as file:  # Creates the file and writes default menu
+        file.write(f"{total_price}\n")
+        file.write(f"{total_quantity}\n")
+        # file.write(f"{quantity_dict}\n")
+        # file.write(f"{table_num}")
 
 
 # Displays the current order with the quantities of each menu item.
 def display_order(total_price, total_quantity, quantity_dict, table_num):
+
     # By default the price doesn't display all 2 decimal points.
     # E.g. a price of "$2.50" would only display "$2.5"
-    # These 3 lines below aim to fix this issue.
+    # These 3 lines below fix this issue.
     total_price = str(total_price)
     if total_price[-2] == ".":
         total_price += "0"
@@ -70,6 +157,7 @@ def display_order(total_price, total_quantity, quantity_dict, table_num):
     print("\n")
 
 
+# Generates a dictionary of how many of each item has been ordered in a simple dict format.
 def get_quantity(names):
     elements_dict = dict()
     for elem in names:  # Iterate over each element in list 
@@ -81,7 +169,8 @@ def get_quantity(names):
     return elements_dict
 
 
-def get_totals(full_order):  # Calculates quantity and cost totals
+# Calculates quantity and cost totals
+def get_totals(full_order):
     prices = []
     for index in range(1, len(full_order)):
         item = full_order[index]  # Gets the Full item information
@@ -104,25 +193,32 @@ def get_totals(full_order):  # Calculates quantity and cost totals
     return total_price, total_quantity, quantity_dict
 
 
-def get_order(data, menu_file):  # Checks order with the existing menu list stored in "menu.txt"
+# Checks order with menu in "menu.txt" and generates 'full_order' var
+def get_order(data, menu_file):
     full_order = []
     table_num = f"Table #{data[0]}"
     full_order.append(table_num)
     tmp_order = ""
-    for i in range(1, len(data)):  # iterates over order input except for table num.
+    for i in range(1, len(data)):  # iterates over order input (data) except for table num.
         menu_num = data[i]  # set the menu_num to i (any number greater than index: 0)
         for menu_item in menu_file:  # Searches for index num in menu_file
             if menu_item[0] == menu_num:
                 tmp_order = menu_item
                 full_order.append(tmp_order)
                 break
+    # The 'full_order' var consists of the table num at 0 and each element 
+    # contains the each order's line in menu.txt one by one.
+
     total_price, total_quantity, quantity_dict = get_totals(full_order)  # Calculates quantity and cost totals.
     display_order(total_price, total_quantity, quantity_dict, table_num)
+    write_order(total_price, total_quantity, quantity_dict, table_num)
+    return total_price, total_quantity, quantity_dict, table_num
 
 
+# Takes menu.txt from the "menu_file" var and prints it to user 
 def print_menu(menu_file):
     items = []
-    for element in menu_file:  # Takes menu_file items and strips them of the categoy e.g. "breakfast"
+    for element in menu_file:  # Takes menu_file items and strips them of the category e.g. "breakfast"
         tmp = []
         for index, el in enumerate(element):
             if not index == 3:
@@ -154,7 +250,7 @@ def print_menu(menu_file):
     print("\n")
 
 
-def get_order_input(menu_file):  # Validates Order 
+def get_order_input(menu_file):  # Validates Order
     print_menu(menu_file)
     while True:
         print("-" * 30)
@@ -185,40 +281,46 @@ def get_order_input(menu_file):  # Validates Order
             print("\nAt least one order must be made per table, please try again.")
         else:
             break
-    get_order(data, menu_file)
-    print(data)
+    # data variable is input data in array format.
+    total_price, total_quantity, quantity_dict, table_num = get_order(data, menu_file)
+    return total_price, total_quantity, quantity_dict, table_num
 
 
-def main_menu(menu_file):  # Main Menu, first menu that the user sees.
-    print("\n----------Main Menu-----------")
-    menu = {
-        "1": [": Input order data", get_order_input],
-        "2": [": Change Menu Items", change_menu_items],
-        "3": [": Finalize Order", finalize_order]
-    }
+# Main Menu, first menu that the user sees.
+def main_menu(menu_file):   # Credits to github.com/RoyceLWC for Menu. 
+    hasData = False
+    while True:
+        print("\n----------Main Menu-----------")
+        menu = {
+            "1": [": Input order data", get_order_input],
+            "2": [": Change Menu Items", editing_main_menu],
+            "3": [": Finalize Order", finalize_order]
+        }
 
-    for key in sorted(menu.keys()):
-        print(key + menu[key][0])  # Prints each menu index and its corresponding functions description
+        # Prints each menu index and its corresponding functions description
+        for key in sorted(menu.keys()):
+            print(key + menu[key][0])
 
-    while True:  # Loop until a valid index is received
+        while True:  # Loop until a valid index is received
+            print("-" * 30)
+            index = input("Select an index: ")
+            try:  # Try to convert to an integer
+                index = int(index)  # Converts to an integer
+                if 1 <= index <= 3:  # In range
+                    break
+                else:  # Out of range
+                    print("Out of range try again!")
+            except ValueError:  # If it can't be converted to an integer
+                print("Invalid index")
+        data = ""
         print("-" * 30)
-        index = input("Select an index: ")
-        try:  # Try to convert to an integer
-            index = int(index)  # Converts to an integer
-            if 1 <= index <= 3:  # In range
-                break
-            else:  # Out of range
-                print("Out of range try again!")
-        except ValueError:  # If it can't be converted to an integer
-            print("Invalid index")
-    data = ""
-    print("-" * 30)
-    if index == 1:  # Get Order data
-        data = menu[str(index)][1](menu_file)
-    elif index == 2:  # change_menu_items
-        menu[str(index)][1]()
-    else:
-        menu[str(index)][1](data)
+        if index == 1:  # Get all data about the order, e.g. price, quantity and table num.
+            total_price, total_quantity, quantity_dict, table_num = menu[str(index)][1](menu_file)
+            hasData = True
+        elif index == 2:  # change_menu_items
+            menu[str(index)][1](menu_file)
+        else:
+            menu[str(index)][1](total_price, total_quantity, quantity_dict, table_num, hasData)
 
 
 def check_file(default_menu):  # Checks for menu and Creates default_menu if doesn't exist.

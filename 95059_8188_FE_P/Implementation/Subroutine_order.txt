@@ -1,0 +1,21 @@
+1. main()
+
+	2. menu_file = check_file(default_menu)
+
+	3. main_menu(menu_file)
+
+		4. get_order_input(menu_file)
+
+			4.a) print_menu(menu_file)
+
+			4.b) get_order(data, menu_file)
+
+					4.c) total_price, total_quantity, quantity_dict = get_totals(full_order)
+
+						4.d) quantity_dict = get_quantity(names)
+
+					4.e) display_order(total_price, total_quantity, quantity_dict, table_num)
+
+					4.f) write_order(total_price, total_quantity, quantity_dict, table_num)
+
+
