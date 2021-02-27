@@ -57,7 +57,6 @@ def edit_menu_items(menu_file):
 
 # Allows user to add menu items to the menu
 def add_menu_items(menu_file):
-    print_menu(menu_file)  # Prints the menu from menu.txt
 
     # User inputs category for new item 
     categories = ["breakfast", "mains", "extras", "drinks"]
@@ -92,6 +91,9 @@ def add_menu_items(menu_file):
                 break
             except ValueError:
                 print("Please input numeric characters only, try again.\n")
+        price = str(price)
+        if price[-2] == ".":
+            price += "0"
 
         # Takes all categories in menu.txt and only
         # stores the category in an array: 'categories_in_file'
@@ -99,18 +101,46 @@ def add_menu_items(menu_file):
         for element in menu_file:  # Iterates over each element in menu.txt
             categories_in_file.append(element[3])
 
-        # Finds how many of 'category' is in the menu.txt
+        # Finds how many of 'category' is in 'categories_in_file'
         # and stores it in variable: 'categories_present'
+        # Along with how what their specific indexes are on
+        # the menu in the 'categories_present_index' variable
         categories_present = 0
         categories_present_index = []
         for index, category_tmp in enumerate(categories_in_file):
             if category_tmp == category:
                 categories_present += 1
-                categories_present_index.append(index)
-        print(categories_present)
-        print(categories_present_index)
-        # TODO: Ask the user where to store the new menu item...
+                categories_present_index.append(int(index+1))
 
+        start_line = min(categories_present_index)  # Assigns min index value
+        final_line = max(categories_present_index)  # Assigns max index value
+        print("-" * 30)
+        print_menu(menu_file, start_line=start_line, final_line=final_line)
+
+        # Get new item's index from user and insert it into the menu file
+        print("What index would you like to assign to your new menu item?\n"
+              f"Please note that items shown above are for the {category} category. "
+              f"Choose an index between {start_line} and {final_line}. "
+              )
+        while True:
+            try:
+                new_index = int(input("Your new menu item index: "))
+                break
+            except ValueError:
+                print("Your index must contain only numeric characters only, try again.")
+
+        # Formatting the new menu item for it to be written to menu.txt
+        new_item = [f'{new_index}', f"{price}", f"{name}", f"{category}"]
+
+        # Adds 1 to the existing menu items' indexes
+        for index, el in enumerate(menu_file, start=1):
+            if index >= new_index:
+                el_index = int(el[0])
+                el_index += 1
+                el[0] = str(el_index)
+        menu_file.insert(new_index-1, new_item)
+
+        # TODO: write menu_file to menu.txt
 
 # Provides menu interface for user to choose to Add, edit or delete menu items
 def editing_main_menu(menu_file):  # Credits to github.com/RoyceLWC for Menu. 
@@ -234,7 +264,7 @@ def get_order(data, menu_file):
 
 
 # Takes menu.txt from the "menu_file" var and prints it to user 
-def print_menu(menu_file):
+def print_menu(menu_file, **kwargs):
     items = []
     for element in menu_file:  # Takes menu_file items and strips them of the category e.g. "breakfast"
         tmp = []
@@ -263,9 +293,24 @@ def print_menu(menu_file):
         periods = period_num * "."
         full_item = f"{number}. {name} {periods} {price}"
         real_output.append(full_item)
-    for item in real_output:
-        print(f"\n{item}")  # Prints all menu items formatted with perfect amount of periods.
-    print("\n")
+
+    # Sets values using kwargs to determine
+    # which specfic lines to iterate over
+    start_line = kwargs.get("start_line")
+    final_line = kwargs.get("final_line")
+
+    # Print if no kwargs are provided
+    if start_line == None and final_line == None:
+        for item in real_output:
+            print(f"\n{item}")  # Prints all menu items formatted with perfect amount of periods.
+        print("\n")
+
+    # kwargs are provided (start_line and final_line)
+    else:
+        for index, item in enumerate(real_output):
+            if start_line <= index+1 <= final_line:  # Index is in correct printing range
+                print(f"\n{item}")  # Prints all menu items formatted with perfect amount of periods.
+        print("\n")
 
 
 def get_order_input(menu_file):  # Validates Order
