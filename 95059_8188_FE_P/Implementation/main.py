@@ -57,7 +57,7 @@ def edit_menu_items(menu_file):
 
 # Allows user to add menu items to the menu
 def add_menu_items(menu_file):
-    print_menu(menu_file)
+    print_menu(menu_file)  # Prints the menu from menu.txt
 
     # User inputs category for new item 
     categories = ["breakfast", "mains", "extras", "drinks"]
@@ -77,7 +77,7 @@ def add_menu_items(menu_file):
         print("Please choose the name of your new menu item.\n")
         while True:
             name = input("Name of new menu item: ")
-            if name.isalpha() == False:
+            if not name.isalpha():
                 print("Name must contain alphabetic characters only, try again.\n")
             else:
                 break
@@ -92,6 +92,24 @@ def add_menu_items(menu_file):
                 break
             except ValueError:
                 print("Please input numeric characters only, try again.\n")
+
+        # Takes all categories in menu.txt and only
+        # stores the category in an array: 'categories_in_file'
+        categories_in_file = []
+        for element in menu_file:  # Iterates over each element in menu.txt
+            categories_in_file.append(element[3])
+
+        # Finds how many of 'category' is in the menu.txt
+        # and stores it in variable: 'categories_present'
+        categories_present = 0
+        categories_present_index = []
+        for index, category_tmp in enumerate(categories_in_file):
+            if category_tmp == category:
+                categories_present += 1
+                categories_present_index.append(index)
+        print(categories_present)
+        print(categories_present_index)
+        # TODO: Ask the user where to store the new menu item...
 
 
 # Provides menu interface for user to choose to Add, edit or delete menu items
