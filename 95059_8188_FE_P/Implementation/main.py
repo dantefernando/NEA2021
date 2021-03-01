@@ -7,7 +7,7 @@
 TODO LIST:
 --------------------------------------------------
 
-- Allow the user to add, amend and delete menu items, and save menu changes
+- Allow the user to add // , edit and delete menu items, and save menu changes
 
 - Allow the menu to be saved to a file
 
@@ -61,10 +61,11 @@ def add_menu_items(menu_file):
     # User inputs category for new item 
     categories = ["breakfast", "mains", "extras", "drinks"]
     print("-" * 30)
-    while True:
+    while True:  # Loops adding item process
+
         print("Please choose the menu category of your new menu item:\n"
               "Categories to choose from: Breakfast, Mains, Extras and drinks\n")
-        while True:
+        while True:  # Validation of category
             category = input("Your category: ").lower()
             if not category in categories:
                 print("Please enter a valid category, try again.\n")
@@ -74,11 +75,29 @@ def add_menu_items(menu_file):
         # User inputs name for new item
         print("-" * 30)
         print("Please choose the name of your new menu item.\n")
-        while True:
-            name = input("Name of new menu item: ")
-            if not name.isalpha():
+        while True:  # Validates Name
+            name_tmp = input("Name of new menu item: ")
+
+            # Checks if name contains only letters and spaces
+            if name_tmp[-1] == " ":
+                print("Name must not contain spaces at the end!")
+            elif not all(letter.isalpha() or letter.isspace() for letter in name_tmp):
                 print("Name must contain alphabetic characters only, try again.\n")
             else:
+                name = ""
+                words = name_tmp.split()  # Splits name_tmp into list
+                len_words = len(words)
+
+                # Takes each word in the string, formats
+                # and concatenates it to variable: "name"
+                for index, word in enumerate(words):
+                    if index == 0:  # First word
+                        word = word.title()  # Makes first letter capital
+                        name += f"{word} "
+                    elif index+1 == len_words:  # last word
+                        name += word
+                    else:  # Other words
+                        name += f"{word} "
                 break
 
         # User inputs price for new item
@@ -102,78 +121,134 @@ def add_menu_items(menu_file):
             categories_in_file.append(element[3])
 
         # Finds how many of 'category' is in 'categories_in_file'
-        # and stores it in variable: 'categories_present'
         # Along with how what their specific indexes are on
         # the menu in the 'categories_present_index' variable
-        categories_present = 0
         categories_present_index = []
         for index, category_tmp in enumerate(categories_in_file):
             if category_tmp == category:
-                categories_present += 1
                 categories_present_index.append(int(index+1))
 
         start_line = min(categories_present_index)  # Assigns min index value
         final_line = max(categories_present_index)  # Assigns max index value
+
         print("-" * 30)
         print_menu(menu_file, start_line=start_line, final_line=final_line)
 
         # Get new item's index from user and insert it into the menu file
         print("What index would you like to assign to your new menu item?\n"
-              f"Please note that items shown above are for the {category} category. "
-              f"Choose an index between {start_line} and {final_line}. "
+              f"Please note that items shown above are for the {category} category.\n"
+              f"Choose an index between {start_line} and {final_line}.\n"
               )
-        while True:
+
+        while True:  # Validation Check of menu item index number
             try:
                 new_index = int(input("Your new menu item index: "))
-                break
+                if new_index < start_line or new_index > final_line:   # Out of range
+                    print(f"Please enter a value between {start_line} and {final_line}.\n")
+                else:
+                    break
             except ValueError:
-                print("Your index must contain only numeric characters only, try again.")
+                print("Your index must contain only numeric characters only, try again.\n")
 
         # Formatting the new menu item for it to be written to menu.txt
         new_item = [f'{new_index}', f"{price}", f"{name}", f"{category}"]
 
+        # Creates temp version as a preview for user 
+        temp_menu_file = menu_file[:]
+
         # Adds 1 to the existing menu items' indexes
-        for index, el in enumerate(menu_file, start=1):
+        for index, el in enumerate(temp_menu_file, start=1):
             if index >= new_index:
                 el_index = int(el[0])
                 el_index += 1
                 el[0] = str(el_index)
-        menu_file.insert(new_index-1, new_item)
+        temp_menu_file.insert(new_index-1, new_item)  # Inserts the new item
 
-        # TODO: write menu_file to menu.txt
+        print("-" * 30)
+        print_menu(temp_menu_file, start_line=start_line, final_line=final_line+1, inserted_line=new_index-1)
+
+        print("\n(S)ave changes and exit\n"
+              "(R)etry and discard changes\n"
+              "Save Changes and (A)dd another menu item\n"
+              "(D)iscard changes and exit\n"
+              )
+        while True:  # Validates input
+            choice = input("Your Choice: ").lower()
+            if choice == "s" or choice == "r" or choice == "a" or choice == "d":
+                break
+            else:
+                print("Please enter either:"
+                      "\"S\" to save,\n"
+                      "\"R\" to retry,\n"
+                      "\"A\" to add another item\n"
+                      "\"D\" to discard changes and exit"
+                      )
+
+        if choice == "s":  # Save and Exit (S)
+            menu_file = temp_menu_file[:]  # Writes temp to menu_file
+            break  # Breaks the while 
+        elif choice == "r":  # Retry without saving changes (R)
+            for index, el in enumerate(temp_menu_file, start=1):
+                if index > new_index:
+                    el_index = int(el[0])
+                    el_index = el_index - 1
+                    el[0] = str(el_index)
+        elif choice == "a":  # Add another item (A)
+            menu_file = temp_menu_file[:]  # Saves changes to menu_file
+        else:  # Exits without saving changes (D)
+            for index, el in enumerate(temp_menu_file, start=1):
+                if index > new_index:
+                    el_index = int(el[0])
+                    el_index = el_index - 1
+                    el[0] = str(el_index)
+            break
+
+    if choice == "s":  # Write changes to menu.txt
+        with open("menu.txt", "w") as file:
+            for item in menu_file:  # writes from menu_file
+                file.write(f"{item[0]},{item[1]},{item[2]},{item[3]}\n")
+    # TODO
+    # IDK IF THIS IS NEEDED
+    # elif choice == "d":
+    #     pass
+    return menu_file
+
 
 # Provides menu interface for user to choose to Add, edit or delete menu items
 def editing_main_menu(menu_file):  # Credits to github.com/RoyceLWC for Menu. 
-    print("\n-------Edit Menu Items--------")
-    menu = {
-        "1": [": Add menu items", add_menu_items],
-        "2": [": Edit an existing menu item", edit_menu_items],
-        "3": [": Delete menu items", delete_menu_items],
-        "4": [": Exit to main menu"]
-    }
+    while True:
+        print("\n-------Edit Menu Items--------")
+        menu = {
+            "1": [": Add menu items", add_menu_items],
+            "2": [": Edit an existing menu item", edit_menu_items],
+            "3": [": Delete menu items", delete_menu_items],
+            "4": [": Exit to main menu"]
+        }
 
-    # Prints each menu index and its corresponding functions description
-    for key in sorted(menu.keys()):
-        print(key + menu[key][0])
+        # Prints each menu index and its corresponding functions description
+        for key in sorted(menu.keys()):
+            print(key + menu[key][0])
 
-    while True:  # Loop until a valid index is received
+        while True:  # Loop until a valid index is received
+            print("-" * 30)
+            index = input("Select an index: ")
+            try:  # Try to convert to an integer
+                index = int(index)  # Converts to an integer
+                if 1 <= index <= 4:  # In range
+                    break
+                else:  # Out of range
+                    print("Out of range try again!")
+            except ValueError:  # If it can't be converted to an integer
+                print("Invalid index")
         print("-" * 30)
-        index = input("Select an index: ")
-        try:  # Try to convert to an integer
-            index = int(index)  # Converts to an integer
-            if 1 <= index <= 4:  # In range
-                break
-            else:  # Out of range
-                print("Out of range try again!")
-        except ValueError:  # If it can't be converted to an integer
-            print("Invalid index")
-    print("-" * 30)
-    if index == 1:  # add_menu_items
-        menu[str(index)][1](menu_file)
-    elif index == 2:  # edit_menu_items
-        menu[str(index)][1](menu_file)
-    elif index == 3:  # delete_menu_items
-        menu[str(index)][1](menu_file)
+        if index == 1:  # add_menu_items
+            menu_file = menu[str(index)][1](menu_file)
+        elif index == 2:  # edit_menu_items
+            menu_file = menu[str(index)][1](menu_file)
+        elif index == 3:  # delete_menu_items
+            menu_file = menu[str(index)][1](menu_file)
+        else:
+            return menu_file
 
 
 # Writes running totals to running_totals.txt
@@ -287,30 +362,40 @@ def print_menu(menu_file, **kwargs):
         number = element[0]
         price = element[1]
         name = element[2]
-        full_item_tmp = f"{number}. {name} {price}"
+        full_item_tmp = f"{number}. {name} ${price}"
         length_of_full = len(full_item_tmp)
         period_num = max_len - length_of_full
         periods = period_num * "."
-        full_item = f"{number}. {name} {periods} {price}"
+        full_item = f"{number}. {name} {periods} ${price}"
         real_output.append(full_item)
 
     # Sets values using kwargs to determine
     # which specfic lines to iterate over
     start_line = kwargs.get("start_line")
     final_line = kwargs.get("final_line")
+    inserted_line = kwargs.get("inserted_line")
 
     # Print if no kwargs are provided
-    if start_line == None and final_line == None:
+    if start_line == None and final_line == None and inserted_line == None:
         for item in real_output:
             print(f"\n{item}")  # Prints all menu items formatted with perfect amount of periods.
-        print("\n")
 
-    # kwargs are provided (start_line and final_line)
-    else:
+    # start_line and final_line are provided but inserted_line isn't
+    elif (start_line != None and final_line != None) and inserted_line == None:
         for index, item in enumerate(real_output):
             if start_line <= index+1 <= final_line:  # Index is in correct printing range
                 print(f"\n{item}")  # Prints all menu items formatted with perfect amount of periods.
-        print("\n")
+
+    # start_line, final_line and inserted_line are all provided as **kwargs
+    elif start_line != None or final_line != None or inserted_line != None:
+        for index, item in enumerate(real_output):
+            if start_line <= index+1 <= final_line:  # Index is in correct printing range
+                if index+1 == inserted_line+1:
+                    # Prints menu items formatted with perfect amount of periods.
+                    print(f"\n{item} <--- YOUR NEW ITEM")
+                else:
+                    print(f"\n{item}")  # Prints all menu items formatted with perfect amount of periods.
+    print("\n")
 
 
 def get_order_input(menu_file):  # Validates Order
@@ -327,8 +412,8 @@ def get_order_input(menu_file):  # Validates Order
         invalidTable = ""
         for index, element in enumerate(data):  # Takes each element in the array
             if index == 0:  # If the element is first (table number doesn't apply for these rules)
-                if element.isnumeric() == False:
-                    invalid = True  # ^If the digit length is greater than 10 is not integer
+                if element.isnumeric() == False:  # If first element in data is NOT numeric:
+                    invalid = True
                 elif int(element) > 10:  # If the element is numerically greater than number of tables in (10)
                     invalidTable = True
             else:
@@ -381,7 +466,7 @@ def main_menu(menu_file):   # Credits to github.com/RoyceLWC for Menu.
             total_price, total_quantity, quantity_dict, table_num = menu[str(index)][1](menu_file)
             hasData = True
         elif index == 2:  # change_menu_items
-            menu[str(index)][1](menu_file)
+            menu_file = menu[str(index)][1](menu_file)
         else:
             menu[str(index)][1](total_price, total_quantity, quantity_dict, table_num, hasData)
 
