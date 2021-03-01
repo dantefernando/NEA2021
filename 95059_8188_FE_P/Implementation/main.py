@@ -58,6 +58,11 @@ def edit_menu_items(menu_file):
 # Allows user to add menu items to the menu
 def add_menu_items(menu_file):
 
+    # Prints the current menu for the user to see
+    print("-" * 30)
+    print("\nThis is the current menu:")
+    print_menu(menu_file)
+
     # User inputs category for new item 
     categories = ["breakfast", "mains", "extras", "drinks"]
     print("-" * 30)
@@ -375,19 +380,57 @@ def print_menu(menu_file, **kwargs):
     final_line = kwargs.get("final_line")
     inserted_line = kwargs.get("inserted_line")
 
-    # Print if no kwargs are provided
-    if start_line == None and final_line == None and inserted_line == None:
-        for item in real_output:
-            print(f"\n{item}")  # Prints all menu items formatted with perfect amount of periods.
+    # Takes all categories in menu.txt and only
+    # stores the category in an array: 'categories_in_file'
 
-    # start_line and final_line are provided but inserted_line isn't
+    categories_in_file = []
+    for element in menu_file:  # Iterates over each element in menu.txt
+        categories_in_file.append(element[3])
+
+    # Finds how many of each category is in the file
+    category_dict = get_quantity(categories_in_file)
+
+    # Formats categories with separators for menu
+    all_keys = []
+    # all_keys_unformatted = []
+    separator = "~"  # Define the separator for printing
+    if start_line == None:  # No **kwargs provided
+        for key in category_dict.keys():  # Iterates over each category
+                full_item_tmp = f"{key} "
+                length_of_full = len(full_item_tmp)
+                separator_num = max_len - length_of_full
+                separators = separator_num * separator
+                full_item = f"\n{key.title()} {separators}"
+                all_keys.append(full_item)
+    else:  # **kwargs provided
+        category = menu_file[start_line-1][3]
+        full_item_tmp = f"{category} "
+        length_of_full = len(full_item_tmp)
+        separator_num = max_len - length_of_full
+        separators = separator_num * separator
+        full_item = f"\n{category.title()} {separators}"
+
+    # Print if no **kwargs are provided
+    if start_line == None and final_line == None and inserted_line == None:
+        current_index = 0  # Current index of real_output
+        for key in all_keys:
+            print(key)
+
+            # Loops for the amount of items there are for that key/category
+            for i in range(category_dict[key.strip(f"{separator} \n").lower()]):
+                print(f"\n{real_output[current_index]}")
+                current_index += 1  # Changes to next key 
+
+    # start_line and final_line are provided but inserted_line isn't as **kwargs
     elif (start_line != None and final_line != None) and inserted_line == None:
+        print(full_item)
         for index, item in enumerate(real_output):
             if start_line <= index+1 <= final_line:  # Index is in correct printing range
                 print(f"\n{item}")  # Prints all menu items formatted with perfect amount of periods.
 
     # start_line, final_line and inserted_line are all provided as **kwargs
     elif start_line != None or final_line != None or inserted_line != None:
+        print(full_item)
         for index, item in enumerate(real_output):
             if start_line <= index+1 <= final_line:  # Index is in correct printing range
                 if index+1 == inserted_line+1:
