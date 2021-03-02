@@ -26,7 +26,7 @@ TODO LIST:
 
 """
 
-default_menu = ["1,5.50,All day (large),breakfast",
+DEFAULT_MENU = ("1,5.50,All day (large),breakfast",
                 "2,3.50,All day (small),breakfast",
                 "3,3.00,Hot dog,mains",
                 "4,4.00,Burger,mains",
@@ -37,7 +37,7 @@ default_menu = ["1,5.50,All day (large),breakfast",
                 "9,2.20,Milkshake,drinks",
                 "10,1.30,Soft drinks,drinks",
                 "11,0.90,Still water,drinks",
-                "12,0.90,Sparkling water,drinks"]
+                "12,0.90,Sparkling water,drinks")
 
 
 def finalize_order():
@@ -514,7 +514,7 @@ def main_menu(menu_file):   # Credits to github.com/RoyceLWC for Menu.
             menu[str(index)][1](total_price, total_quantity, quantity_dict, table_num, hasData)
 
 
-def check_file(default_menu):  # Checks for menu and Creates default_menu if doesn't exist.
+def check_file(DEFAULT_MENU):  # Checks for menu and Creates DEFAULT_MENU if doesn't exist.
     for i in range(2):  # Quick fix for the file not being read on first try idk.
         try:  # Check for existing file by trying to read the file
             with open("menu.txt", "r") as file:
@@ -524,18 +524,16 @@ def check_file(default_menu):  # Checks for menu and Creates default_menu if doe
                     element = element.strip("\n")
                     element = element.split(",")
                     menu_file.append(element)
-                file.close()
                 return menu_file
         except IOError:  # If menu.txt is not found, make a new file
             with open("menu.txt", "w") as file:  # Creates the file and writes default menu
-                for line in default_menu:
+                for line in DEFAULT_MENU:
                     file.write(f"{line}\n")
-                file.close()
-            check_file(default_menu)
+            check_file(DEFAULT_MENU)
 
 
 def main():
-    menu_file = check_file(default_menu)  # Checks for menu and Creates default_menu if doesn't exist.
+    menu_file = check_file(DEFAULT_MENU)  # Checks for menu and Creates DEFAULT_MENU if doesn't exist.
     main_menu(menu_file)
 
 

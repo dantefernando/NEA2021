@@ -1,12 +1,13 @@
 1,5.50,All day (large),breakfast
 2,3.50,All day (small),breakfast
-3,3.00,Hot dog,mains
-4,4.00,Burger,mains
-5,4.25,Cheese burger,mains
-6,3.50,Chicken goujons,mains
-7,1.75,Fries,extras
-8,2.20,Salad,extras
-9,2.20,Milkshake,drinks
-10,1.30,Soft drinks,drinks
-11,0.90,Still water,drinks
-12,0.90,Sparkling water,drinks
+3,500.84,Big Burger,mains
+4,3.00,Hot dog,mains
+5,4.00,Burger,mains
+6,4.25,Cheese burger,mains
+7,3.50,Chicken goujons,mains
+8,1.75,Fries,extras
+9,2.20,Salad,extras
+10,2.20,Milkshake,drinks
+11,1.30,Soft drinks,drinks
+12,0.90,Still water,drinks
+13,0.90,Sparkling water,drinks
