@@ -51,8 +51,23 @@ def delete_menu_items():
 
 # Allows user to edit menu items
 def edit_menu_items(menu_file):
-    pass
-    # max_index = len(menu_file)  # The highest index out of all the items on the menu list 
+    print("-" * 30)
+    print("\nThis is the current menu:")
+    print_menu(menu_file)
+
+    # Asks the user what menu item index they want to edit`
+    while True:  # TODO: CHECK THIS FOR ERRORS DIDN"T HAVE TIME IN CS
+        try:
+            edit_index = int(input("What menu item index would you like to edit?"))
+            tmp_last_item = menu_file[len(menu_file) -  1]  # Assigns Last entry's index
+            last_item_index = int(tmp_last_item[0])                    # to "last_item"
+            if edit_index > last_item_index or edit_index < 1:
+                print(f"You cannot enter an index higher than: {last_item_index}\n"
+                      "Please try again...\n")
+            else:  # Index is valid
+                break
+        except ValueError:  # User entered input other than an integer
+            print("Please enter numeric characters only, try again.\n")
 
 
 # Allows user to add menu items to the menu
@@ -212,10 +227,6 @@ def add_menu_items(menu_file):
         with open("menu.txt", "w") as file:
             for item in menu_file:  # writes from menu_file
                 file.write(f"{item[0]},{item[1]},{item[2]},{item[3]}\n")
-    # TODO
-    # IDK IF THIS IS NEEDED
-    # elif choice == "d":
-    #     pass
     return menu_file
 
 
@@ -246,13 +257,10 @@ def editing_main_menu(menu_file):  # Credits to github.com/RoyceLWC for Menu.
             except ValueError:  # If it can't be converted to an integer
                 print("Invalid index")
         print("-" * 30)
-        if index == 1:  # add_menu_items
-            menu_file = menu[str(index)][1](menu_file)
-        elif index == 2:  # edit_menu_items
-            menu_file = menu[str(index)][1](menu_file)
-        elif index == 3:  # delete_menu_items
-            menu_file = menu[str(index)][1](menu_file)
-        else:
+
+        menu_file = menu[str(index)][1](menu_file)
+
+        if index == 4:
             return menu_file
 
 
