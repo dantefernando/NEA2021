@@ -51,23 +51,199 @@ def delete_menu_items():
 
 # Allows user to edit menu items
 def edit_menu_items(menu_file):
-    print("-" * 30)
-    print("\nThis is the current menu:")
-    print_menu(menu_file)
+    while True:
+        print("-" * 30)
+        print("\nThis is the current menu:")
+        print_menu(menu_file)
 
-    # Asks the user what menu item index they want to edit`
-    while True:  # TODO: CHECK THIS FOR ERRORS DIDN"T HAVE TIME IN CS
-        try:
-            edit_index = int(input("What menu item index would you like to edit?"))
-            tmp_last_item = menu_file[len(menu_file) -  1]  # Assigns Last entry's index
-            last_item_index = int(tmp_last_item[0])                    # to "last_item"
-            if edit_index > last_item_index or edit_index < 1:
-                print(f"You cannot enter an index higher than: {last_item_index}\n"
-                      "Please try again...\n")
-            else:  # Index is valid
+        # Asks the user what menu item index they want to edit
+        print("Enter a menu item index to edit\n"
+              "Or type \"e\" to exit.\n"
+              )
+        while True:
+            try:
+                inp = input("Your choice: ")
+                edit_index = int(inp)
+
+                # Assigns Last entry's index to "last_item"
+                tmp_last_item = menu_file[len(menu_file) - 1]
+                last_item_index = int(tmp_last_item[0])
+                if edit_index > last_item_index or edit_index < 1:  # Out of range
+                    print(f"Your index must be between: 1 and {last_item_index}\n"
+                          "Please try again...\n")
+                else:  # Index is valid
+                    break
+            except ValueError:  # User entered input other than an integer
+                if inp == "e":
+                    break
+                else:
+                    print("Please enter numeric characters only, try again.\n")
+
+        if inp == "e":  # Breaks the whole loop and exits to menu
+            return menu_file
+
+        # Loop for asking user what to edit of that item until they choose to exit.
+        while True:
+            current_name = menu_file[edit_index-1][2]
+            print("-" * 30)
+            # Prints only that element in the menu with the catergory
+            print_menu(menu_file, start_line=edit_index, final_line=edit_index)
+
+            print(f"Enter a letter from below to choose what to edit of {current_name}:\n"
+                  "(I)ndex # of item\n"
+                  "(N)ame of item\n"
+                  "(P)rice\n"
+                  "(C)ategory\n"
+                  "Enter \"E\" to (E)xit and choose another item edit or exit.\n"
+                  )
+            while True:  # Validates input for ch
+                inp = input("Your choice: ").lower()
+                if inp == "i" or inp == "n" or inp == "p" or inp == "c" or inp == "e": # Valid input is received
+                    break  # Breaks the loop
+                else:
+                    print("Your input must be either: \"I\", \"N\", \"P\" or \"C\". Try again!")
+
+            if inp == "i":  # User wants to change index number
+                # TODO
+                # original = menu_file[edit_index-1][0]  # Sets original to current index num for item
+                # print(f"Current index number of item is: {original}")
+                pass
+
+            elif inp == "n":  # User wants to change name
+                original = menu_file[edit_index-1][2]  # Sets original to current name for item
+                print(f"Current name of item is: {original}")
+
+                print("Please choose the name of your new menu item.\n")
+                while True:  # Validates Name
+                    name_tmp = input("Name of new menu item: ")
+
+                    # Checks if name contains only letters and spaces
+                    if name_tmp[-1] == " ":
+                        print("Name must not contain spaces at the end!")
+                    elif not all(letter.isalpha() or letter.isspace() for letter in name_tmp):
+                        print("Name must contain alphabetic characters only, try again.\n")
+                    else:
+                        name = ""
+                        words = name_tmp.split()  # Splits name_tmp into list
+                        len_words = len(words)
+
+                        # Takes each word in the string, formats
+                        # and concatenates it to variable: "name"
+                        for index, word in enumerate(words):
+                            if index == 0:  # First word
+                                word = word.title()  # Makes first letter capital
+                                name += f"{word} "
+                            elif index+1 == len_words:  # last word
+                                name += word
+                            else:  # Other words
+                                name += f"{word} "
+                        break
+
+                menu_file[edit_index-1][2] = name
+                print(f"Name changed to {name}")
+
+            elif inp == "p":  # User wants to change price
+                original = menu_file[edit_index-1][1]  # Sets to current price of item
+                print(f"Current price of item is: {original}")
+
+                print("Please choose the price of your new menu item.\n")
+                while True:
+                    try:
+                        price_unrounded = float(input("Price of new menu item: $"))
+                        price = round(price_unrounded,2)  # Total price stored as a float 
+                        break
+                    except ValueError:
+                        print("Please input numeric characters only, try again.\n")
+                price = str(price)
+                if price[-2] == ".":
+                    price += "0"
+
+                menu_file[edit_index-1][1] = price  # Assigns the new price to the menu item
+                print(f"Price changed to {price}")
+
+            elif inp == "c":  # User inputs category for new item 
+                old_category = menu_file[edit_index-1][3]  # Sets to current/old category
+                categories = ["breakfast", "mains", "extras", "drinks"]
+                print("-" * 30)
+                print("Please choose the menu category of your new menu item:\n"
+                      "Categories to choose from: Breakfast, Mains, Extras and drinks\n")
+
+                while True:  # Validation of category
+                    new_category = input("Your category: ").lower()
+                    if new_category in categories:
+                        break
+                    else:
+                        print("Please enter a valid category, try again.\n")
+
+                if new_category == old_category:  # Category hasn't changed
+                    menu_file[edit_index-1][3] = new_category  # Assigns the new price to the menu item
+                    print(f"Category changed to {new_category}")
+                elif new_category != old_category:  # Categeory has changed
+
+                    # Takes all categories in menu.txt and only
+                    # stores the category in an array: 'categories_in_file'
+                    categories_in_file = []
+                    for element in menu_file:  # Iterates over each element in menu.txt
+                        categories_in_file.append(element[3])
+
+                    # Finds how many of 'category' is in 'categories_in_file'
+                    # Along with how what their specific indexes are on
+                    # the menu in the 'categories_present_index' variable
+                    categories_present_index = []
+                    for index, category_tmp in enumerate(categories_in_file):
+                        if category_tmp == new_category:
+                            categories_present_index.append(int(index+1))
+
+                    start_line = min(categories_present_index)  # Assigns min index value
+                    final_line = max(categories_present_index)  # Assigns max index value
+
+                    print("-" * 30)
+                    print_menu(menu_file, start_line=start_line, final_line=final_line)
+
+                    # Get new item's index from user and insert it into the menu file
+                    print("You must assign a new index to your item since it's in a different category than before.\n"
+                          f"Please note that items shown above are for the {new_category} category.\n"
+                          f"Choose an index between {start_line} and {final_line}.\n"
+                          )
+
+                    old_index = menu_file[edit_index-1][0]  # Saves old index for later
+
+                    while True:  # Validation Check of menu item index number
+                        try:
+                            new_index = int(input("Your new menu item index: "))
+                            if new_index < start_line or new_index > final_line:   # Out of range
+                                print(f"Please enter a value between {start_line} and {final_line}.\n")
+                            else:
+                                break
+                        except ValueError:
+                            print("Your index must contain only numeric characters only, try again.\n")
+
+                    menu_file[edit_index-1][0] = str(new_index)  # Assigns the new index to the menu item
+                    menu_file[edit_index-1][3] = new_category
+                    print(f"Index changed to {new_index}")
+
+                    # Corrects the index numbers in the menu
+                    for full_item in menu_file:
+                        if not full_item == menu_file[edit_index-1]:  # IF full_item is not the edited item
+                            # Index numbers that are greater than the old index
+                            if int(full_item[0]) > int(old_index):  # If the index is greater than the old index
+                                tmp_index = int(full_item[0])  # Assign to the index of the current full_item
+                                tmp_index = tmp_index - 1  # Subtracts one from the current index and applies it
+                                full_item[0] = str(tmp_index)
+
+                            # Index numbers are greater than or equal to the new index and are less than old index
+                            elif int(full_item[0]) < int(old_index) and int(full_item[0]) >= int(new_index):
+                                tmp_index = int(full_item[0])  # Assign to the index of the current full_item
+                                tmp_index += 1  # Adds one to the current index and applies it
+                                full_item[0] = str(tmp_index)
+
+                    menu_file.insert(new_index-1, menu_file[edit_index-1])  # Inserts the new item
+                    del menu_file[int(old_index)]  # Deletes the old menu_item
+                    edit_index = new_index  # Saves edit_index for next use
+
+
+            else:  # User wants to exit editing loop of current item
                 break
-        except ValueError:  # User entered input other than an integer
-            print("Please enter numeric characters only, try again.\n")
 
 
 # Allows user to add menu items to the menu
@@ -258,10 +434,11 @@ def editing_main_menu(menu_file):  # Credits to github.com/RoyceLWC for Menu.
                 print("Invalid index")
         print("-" * 30)
 
-        menu_file = menu[str(index)][1](menu_file)
-
         if index == 4:
             return menu_file
+        else:
+            menu_file = menu[str(index)][1](menu_file)
+
 
 
 # Writes running totals to running_totals.txt
@@ -387,6 +564,7 @@ def print_menu(menu_file, **kwargs):
     start_line = kwargs.get("start_line")
     final_line = kwargs.get("final_line")
     inserted_line = kwargs.get("inserted_line")
+    single_line = kwargs.get("single_line")
 
     # Takes all categories in menu.txt and only
     # stores the category in an array: 'categories_in_file'
