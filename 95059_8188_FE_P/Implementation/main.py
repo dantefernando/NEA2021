@@ -7,7 +7,7 @@
 TODO LIST:
 --------------------------------------------------
 
-- Allow the user to add // , edit and delete menu items, and save menu changes
+- Allow the user to add // , edit // and delete menu items
 
 - Allow the menu to be saved to a file
 
@@ -23,6 +23,8 @@ TODO LIST:
 --------------------------------------------------
 
 - When printing the menu, display when the file was made/last modified
+
+- Remove Royce's menu stuff and programm ur own one because ur not retarded.
 
 """
 
@@ -84,11 +86,11 @@ def edit_menu_items(menu_file):
 
         # Loop for asking user what to edit of that item until they choose to exit.
         while True:
-            current_name = menu_file[edit_index-1][2]
             print("-" * 30)
             # Prints only that element in the menu with the catergory
             print_menu(menu_file, start_line=edit_index, final_line=edit_index)
 
+            current_name = menu_file[edit_index-1][2]
             print(f"Enter a letter from below to choose what to edit of {current_name}:\n"
                   "(I)ndex # of item\n"
                   "(N)ame of item\n"
@@ -96,7 +98,7 @@ def edit_menu_items(menu_file):
                   "(C)ategory\n"
                   "Enter \"E\" to (E)xit and choose another item edit or exit.\n"
                   )
-            while True:  # Validates input for ch
+            while True:  # Validates input for choice
                 inp = input("Your choice: ").lower()
                 if inp == "i" or inp == "n" or inp == "p" or inp == "c" or inp == "e": # Valid input is received
                     break  # Breaks the loop
@@ -163,21 +165,23 @@ def edit_menu_items(menu_file):
 
             elif inp == "c":  # User inputs category for new item 
                 old_category = menu_file[edit_index-1][3]  # Sets to current/old category
+
                 categories = ["breakfast", "mains", "extras", "drinks"]
                 print("-" * 30)
                 print("Please choose the menu category of your new menu item:\n"
-                      "Categories to choose from: Breakfast, Mains, Extras and drinks\n")
+                      "Categories to choose from: Breakfast, Mains, Extras and Drinks\n")
 
                 while True:  # Validation of category
                     new_category = input("Your category: ").lower()
-                    if new_category in categories:
+                    if new_category in categories:  # Category is valid
                         break
                     else:
                         print("Please enter a valid category, try again.\n")
 
                 if new_category == old_category:  # Category hasn't changed
-                    menu_file[edit_index-1][3] = new_category  # Assigns the new price to the menu item
-                    print(f"Category changed to {new_category}")
+                    # menu_file[edit_index-1][3] = new_category  # Assigns the new category to the menu item
+                    print(f"Category not changed. ({new_category} is the same category as before)")
+
                 elif new_category != old_category:  # Categeory has changed
 
                     # Takes all categories in menu.txt and only
@@ -218,29 +222,20 @@ def edit_menu_items(menu_file):
                         except ValueError:
                             print("Your index must contain only numeric characters only, try again.\n")
 
-                    menu_file[edit_index-1][0] = str(new_index)  # Assigns the new index to the menu item
-                    menu_file[edit_index-1][3] = new_category
+                    tmp_new_item = menu_file[edit_index-1]  # Saves the new item to tmp_new_item
+                    del menu_file[edit_index-1]  # Deletes the old item
+
+                    tmp_new_item[0] = str(new_index)  # Assigns the new index to the menu item
+                    tmp_new_item[3] = new_category  # Assigns the new category to the menu item
+
+                    menu_file.insert(new_index-1, tmp_new_item)  # Inserts the tmp menu item
                     print(f"Index changed to {new_index}")
 
                     # Corrects the index numbers in the menu
-                    for full_item in menu_file:
-                        if not full_item == menu_file[edit_index-1]:  # IF full_item is not the edited item
-                            # Index numbers that are greater than the old index
-                            if int(full_item[0]) > int(old_index):  # If the index is greater than the old index
-                                tmp_index = int(full_item[0])  # Assign to the index of the current full_item
-                                tmp_index = tmp_index - 1  # Subtracts one from the current index and applies it
-                                full_item[0] = str(tmp_index)
+                    for index, full_item in enumerate(menu_file, start=1):
+                        full_item[0] = str(index)
 
-                            # Index numbers are greater than or equal to the new index and are less than old index
-                            elif int(full_item[0]) < int(old_index) and int(full_item[0]) >= int(new_index):
-                                tmp_index = int(full_item[0])  # Assign to the index of the current full_item
-                                tmp_index += 1  # Adds one to the current index and applies it
-                                full_item[0] = str(tmp_index)
-
-                    menu_file.insert(new_index-1, menu_file[edit_index-1])  # Inserts the new item
-                    del menu_file[int(old_index)]  # Deletes the old menu_item
                     edit_index = new_index  # Saves edit_index for next use
-
 
             else:  # User wants to exit editing loop of current item
                 break
@@ -718,11 +713,6 @@ def check_file(DEFAULT_MENU):  # Checks for menu and Creates DEFAULT_MENU if doe
             check_file(DEFAULT_MENU)
 
 
-def main():
-    menu_file = check_file(DEFAULT_MENU)  # Checks for menu and Creates DEFAULT_MENU if doesn't exist.
-    main_menu(menu_file)
-
-
-if __name__ == "__main__":
-    main()
+menu_file = check_file(DEFAULT_MENU)  # Checks for menu and Creates DEFAULT_MENU if doesn't exist.
+main_menu(menu_file)  # Main Menu for most the program
 
