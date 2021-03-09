@@ -12,26 +12,7 @@ TODO LIST:
 
 --------------------------------------------------
 
-~Editing Section~
-
-- Allow the user to delete menu items | delete_menu_items()
-
-- Allow the menu to be saved to a file | editing_main_menu()
-
---------------------------------------------------
-
-~End Game~
-
-- Calculate the total cost of the order | finalize_order()
-
-- Provide options to display the menu and running totals | main_menu()
-
-- Display the order details for printing | finalize_order()
-
-- Loop for input of the next order | finalize_order() and main_menu()
---------------------------------------------------
-
-Extras (not required for GCSE NEA but still important)
+~Extras (not required for GCSE NEA but still important)~
 
 - When printing the menu, display when the file was made/last modified | print_menu()
 
@@ -57,8 +38,37 @@ DEFAULT_MENU = ("1,5.50,All day (large),breakfast",
                 "12,0.90,Sparkling water,drinks")
 
 
-def finalize_order():
-    pass
+def finalize_order(total_price, total_quantity, quantity_dict, table_num, hasData):
+    print("\n######## BEGIN PRINTING ########")
+    print("\nFinal order:")
+    display_order(total_price, total_quantity, quantity_dict, table_num)
+
+    while True:
+        print("Enter \"Y\" to Exit and enter another order\n"
+              "Enter \"N\" to Exit and keep current order\n"
+              "Enter \"Q\" to Quit the program\n")
+        inp = input("Your choice: ").lower()
+
+        if inp == "y":  # user exits and enters another order
+
+            # Resets all order values
+            total_price = None
+            total_quantity = None
+            quantity_dict = None
+            table_num = None
+            hasData = False
+
+            return total_price, total_quantity, quantity_dict, table_num, hasData
+
+        elif inp == "n":  # User exits and keeps current order
+            return total_price, total_quantity, quantity_dict, table_num, hasData
+
+        elif inp == "q":  # User quits the program
+            quit()
+
+        else:  # User input is invalid 
+            print("Please enter \"y\" or \"n\" as your choice, try again.\n")
+
 
 
 def options(menu_file):  # Options menu for the whole program
@@ -79,9 +89,10 @@ def options(menu_file):  # Options menu for the whole program
                     choiceInp = input("Your choice: ").lower()
 
                     if choiceInp == "y":  # User wants to reset
-                        with open("menu.txt", "w+") as file:  # Creates the file and writes default menu
+                        with open("menu.txt", "w") as file:  # Creates the file and writes default menu
                             for line in DEFAULT_MENU:
                                 file.write(f"{line}\n")
+                        with open("menu.txt", "r") as file:
                             whole_file = file.readlines()  # Stores the menu in the file as "whole_file"
                             menu_file = []
                             for element in whole_file:
@@ -111,8 +122,76 @@ def options(menu_file):  # Options menu for the whole program
 
 
 # Allows user to delete menu items
-def delete_menu_items():
-    pass
+def delete_menu_items(menu_file):
+    while True:
+        print("-" * 30)
+        print("\nThis is the current menu:")
+        print_menu(menu_file)
+
+        # Asks the user what menu item index they want to delete
+        print("Enter a menu item index to delete\n"
+              "Or type \"E\" to exit.\n")
+
+        try:
+            inp = input("Your choice: ")
+            delete_index = int(inp)
+
+            # Assigns Last entry's index to "last_item"
+            name = menu_file[delete_index-1][2]
+            tmp_last_item = menu_file[len(menu_file) - 1]
+            last_item_index = int(tmp_last_item[0])
+            if delete_index > last_item_index or delete_index < 1:  # Out of range
+                print(f"Your delete index must be between: 1 and {last_item_index}\n"
+                      "Please try again...\n")
+            else:  # Index is valid
+                print(f"Are you sure you want to delete {name}?\n"
+                      "- Enter \"Y\" to Confirm Menu Item Deletion\n"
+                      "- Enter \"N\" to Discard Changes and Exit to Edit Menu\n")
+
+                while True:  # Validates input for delete item or Exit
+                    choiceInp = input("Your choice: ").lower()
+
+                    if choiceInp == "y":  # User wants to delete the menu item
+                        # Deletes the menu item
+                        del menu_file[delete_index-1]
+
+                        # Corrects menu index numbers in the list 
+                        for index, full_item in enumerate(menu_file, start=1):
+                            full_item[0] = str(index)
+
+                        print(f"{name} Deleted!")
+                        break
+
+                    elif choiceInp == "n":  # User wants to exit 
+                        break
+                    else:
+                        print("Please enter \"y\" or \"n\" as your choice, try again.\n")
+
+                if choiceInp == "n":  # User exits instead of deleting menu item
+                    print("Exiting...\n")
+                    break
+
+        except ValueError:  # User entered input other than an integer
+            if inp == "e":
+                break
+            else:
+                print("Please enter numeric characters only, try again.\n")
+    return menu_file
+
+
+    if inp == "e":  # Breaks the whole loop and exits to menu
+        return menu_file
+
+
+def write_menu(menu_file):
+    with open("menu.txt", "w") as file:  # Creates the file and writes menu_file
+        for line in menu_file:  # Iterates over each full item in menu item
+            index_num = line[0]  # Assigns to index number
+            price = line[1]  # Assigns to price
+            name = line[2]  # Assigns to name
+            category = line[3]  # Assigns to category 
+
+            file.write(f"{index_num},{price},{name},{category}\n")
 
 
 # Allows user to edit menu items
@@ -519,7 +598,8 @@ def editing_main_menu(menu_file):  # Credits to github.com/RoyceLWC for Menu.
                 print("Invalid index")
         print("-" * 30)
 
-        if index == 4:
+        if index == 4:  # User wants to exit the menu 
+            write_menu(menu_file)  # Saves the menu to menu.txt
             return menu_file
         else:
             menu_file = menu[str(index)][1](menu_file)
@@ -545,7 +625,6 @@ def display_order(total_price, total_quantity, quantity_dict, table_num):
     if total_price[-2] == ".":
         total_price += "0"
 
-    print("-" * 30)
     print(f"\nYour order for {table_num}: \n")
     for key, value in quantity_dict.items():
         print(key , ' == ', value)
@@ -716,7 +795,7 @@ def get_order_input(menu_file):  # Validates Order
     print_menu(menu_file)
     while True:
         print("-" * 30)
-        print("\nE.g. \"6, 4, 4, 7, 8, 10, 10\""
+        print("\nE.g. \"6,4,4,7,8,10,10\""
               " Would be an order from Table 6 for 2 Burgers, 1 Fries, 1 Salad and 2 Soft"
               " Drinks.")
         data = input("\nType order here: ").split(",")
@@ -769,7 +848,7 @@ def main_menu(menu_file):   # Credits to github.com/RoyceLWC for Menu.
             index = input("Select an index: ")
             try:  # Try to convert to an integer
                 index = int(index)  # Converts to an integer
-                if 1 <= index <= 3:  # In range
+                if 1 <= index <= 4:  # In range
                     break
                 else:  # Out of range
                     print("Out of range try again!")
@@ -782,8 +861,11 @@ def main_menu(menu_file):   # Credits to github.com/RoyceLWC for Menu.
             hasData = True
         elif index == 2 or index == 3:  # change_menu_items
             menu_file = menu[str(index)][1](menu_file)
-        else:
-            menu[str(index)][1](total_price, total_quantity, quantity_dict, table_num, hasData)
+        else:  # finalize_order()
+            if not hasData:  # No order data
+                print("No current order! Go back and Input an order.")
+            else:
+                total_price, total_quantity, quantity_dict, table_num, hasData = menu[str(index)][1](total_price, total_quantity, quantity_dict, table_num, hasData)
 
 
 def check_file(DEFAULT_MENU):  # Checks for menu and Creates DEFAULT_MENU if doesn't exist.
