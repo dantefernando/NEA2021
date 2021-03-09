@@ -5,28 +5,43 @@
 """
 
 TODO LIST:
+
+~Order Section~
+
+- Make it so that it's possible to add input order data with spaces | get_order_input()
+
 --------------------------------------------------
 
-- Allow the user to add // , edit // and delete menu items
+~Editing Section~
 
-- Allow the menu to be saved to a file
+- Allow the user to delete menu items | delete_menu_items()
+
+- Allow the menu to be saved to a file | editing_main_menu()
 
 --------------------------------------------------
 
-- Calculate the total cost of the order
+~End Game~
 
-- Provide options to display the menu and running totals
+- Calculate the total cost of the order | finalize_order()
 
-- Display the order details for printing
+- Provide options to display the menu and running totals | main_menu()
 
-- Loop for input of the next order
+- Display the order details for printing | finalize_order()
+
+- Loop for input of the next order | finalize_order() and main_menu()
 --------------------------------------------------
 
-- When printing the menu, display when the file was made/last modified
+Extras (not required for GCSE NEA but still important)
 
-- Remove Royce's menu stuff and programm ur own one because ur not retarded.
+- When printing the menu, display when the file was made/last modified | print_menu()
+
+- Remove Royce's menu stuff and program ur own because ur not retarded. | main_menu() and editing_main_menu()
+
+- In the options menu, allow for renaming restaurant and other options. | options()
 
 """
+
+# DEFAULT_MENU is used in check_file() upon running program for first time.
 
 DEFAULT_MENU = ("1,5.50,All day (large),breakfast",
                 "2,3.50,All day (small),breakfast",
@@ -44,6 +59,55 @@ DEFAULT_MENU = ("1,5.50,All day (large),breakfast",
 
 def finalize_order():
     pass
+
+
+def options(menu_file):  # Options menu for the whole program
+    print("\n-------Options Menu--------")
+    print("1: Reset Menu Items File\n"
+          "2: Exit to Main Menu\n")
+    while True:  # Validates user input choice
+        try:
+            inp = int(input("Your Choice: "))
+            if inp == 1:  # inp==1 | User attempts reset of file
+                print("Are you sure you want to reset the Menu Items File? (menu.txt)?\n"
+                      "This will erase all saved changes to the file and reset it to\n"
+                      "defaults.\n\n"
+                      "- Enter \"Y\" to CONFIRM MENU RESET\n"
+                      "- Enter \"N\" to DISCARD CHANGES AND EXIT\n")
+
+                while True:  # Validates input for Reset or Exit
+                    choiceInp = input("Your choice: ").lower()
+
+                    if choiceInp == "y":  # User wants to reset
+                        with open("menu.txt", "w+") as file:  # Creates the file and writes default menu
+                            for line in DEFAULT_MENU:
+                                file.write(f"{line}\n")
+                            whole_file = file.readlines()  # Stores the menu in the file as "whole_file"
+                            menu_file = []
+                            for element in whole_file:
+                                element = element.strip("\n")
+                                element = element.split(",")
+                                menu_file.append(element)
+
+                        print("File reset!\n")
+                        return menu_file
+
+                    elif choiceInp == "n":  # User wants to exit 
+                        break
+                    else:
+                        print("Please enter \"y\" or \"n\" as your choice, try again.\n")
+
+                if choiceInp == "n":  # User exits instead of resetting
+                    print("Exiting...\n")
+                    break
+            elif inp == 2:  # inp==2 | User Exits
+                print("Exiting...\n")
+                break
+            else:  # Not valid
+                print("Please enter 1 or 2 as your choice.\n")
+        except ValueError:  # User doesn't input numeric characters
+            print("Please enter numeric characters only, try again.\n")
+    return menu_file
 
 
 # Allows user to delete menu items
@@ -106,10 +170,36 @@ def edit_menu_items(menu_file):
                     print("Your input must be either: \"I\", \"N\", \"P\" or \"C\". Try again!")
 
             if inp == "i":  # User wants to change index number
-                # TODO
-                # original = menu_file[edit_index-1][0]  # Sets original to current index num for item
-                # print(f"Current index number of item is: {original}")
-                pass
+                print_menu(menu_file, start_line=edit_index, final_line=edit_index)
+
+                print("Choose the menu item index number that you want it to change to: ")
+                while True:  # Validates input for inputting index to change to 
+                    try:
+                        inp = int(input("Index Number: "))
+                        # Assigns Last entry's index to "last_item"
+                        tmp_last_item = menu_file[len(menu_file) - 1]
+                        last_item_index = int(tmp_last_item[0])
+                        if inp > last_item_index or inp < 1:  # Out of range
+                            print(f"Your index must be between: 1 and {last_item_index}\n"
+                                  "Please try again...\n")
+                        else:  # Index is valid
+                            break
+                    except ValueError:  # User entered input other than an integer
+                        print("Please enter numeric characters only, try again.\n")
+
+                tmp_menu_item = menu_file[edit_index-1]  # Sets tmp to selected item 
+                tmp_menu_item[3] = menu_file[inp-1][3]  # Sets tmp's category to item to be inserted above
+
+                del menu_file[edit_index-1]  # deletes the old item
+                menu_file.insert(inp-1, tmp_menu_item)  # Inserts the tmp menu item
+
+                # Corrects the index numbers in the list
+                for index, full_item in enumerate(menu_file, start=1):
+                    full_item[0] = str(index)
+
+                print(f"Index changed to {inp}.")
+
+                edit_index = inp
 
             elif inp == "n":  # User wants to change name
                 original = menu_file[edit_index-1][2]  # Sets original to current name for item
@@ -666,7 +756,8 @@ def main_menu(menu_file):   # Credits to github.com/RoyceLWC for Menu.
         menu = {
             "1": [": Input order data", get_order_input],
             "2": [": Change Menu Items", editing_main_menu],
-            "3": [": Finalize Order", finalize_order]
+            "3": [": Options", options],
+            "4": [": Finalize Order", finalize_order]
         }
 
         # Prints each menu index and its corresponding functions description
@@ -689,7 +780,7 @@ def main_menu(menu_file):   # Credits to github.com/RoyceLWC for Menu.
         if index == 1:  # Get all data about the order, e.g. price, quantity and table num.
             total_price, total_quantity, quantity_dict, table_num = menu[str(index)][1](menu_file)
             hasData = True
-        elif index == 2:  # change_menu_items
+        elif index == 2 or index == 3:  # change_menu_items
             menu_file = menu[str(index)][1](menu_file)
         else:
             menu[str(index)][1](total_price, total_quantity, quantity_dict, table_num, hasData)
@@ -715,4 +806,3 @@ def check_file(DEFAULT_MENU):  # Checks for menu and Creates DEFAULT_MENU if doe
 
 menu_file = check_file(DEFAULT_MENU)  # Checks for menu and Creates DEFAULT_MENU if doesn't exist.
 main_menu(menu_file)  # Main Menu for most the program
-
