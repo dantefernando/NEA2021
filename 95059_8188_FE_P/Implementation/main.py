@@ -8,17 +8,13 @@ TODO LIST:
 
 ~Order Section~
 
-- Make it so that it's possible to add input order data with spaces | get_order_input()
+- Add confirmation when renaming the categories for edit_menu_items()
 
 --------------------------------------------------
 
 ~Extras (not required for GCSE NEA but still important)~
 
-- When printing the menu, display when the file was made/last modified | print_menu()
-
 - Remove Royce's menu stuff and program ur own because ur not retarded. | main_menu() and editing_main_menu()
-
-- In the options menu, allow for renaming restaurant and other options. | options()
 
 """
 
@@ -39,14 +35,15 @@ DEFAULT_MENU = ("1,5.50,All day (large),breakfast",
 
 
 def finalize_order(total_price, total_quantity, quantity_dict, table_num, hasData):
-    print("\n######## BEGIN PRINTING ########")
+    print("\n######## BEGIN PRINTING ########\n")
+    print("TIMS DINER\n")
     print("\nFinal order:")
     display_order(total_price, total_quantity, quantity_dict, table_num)
 
     while True:
-        print("Enter \"Y\" to Exit and enter another order\n"
-              "Enter \"N\" to Exit and keep current order\n"
-              "Enter \"Q\" to Quit the program\n")
+        print("- Enter \"Y\" to Exit and enter another order\n"
+              "- Enter \"N\" to Exit and keep current order\n"
+              "- Enter \"Q\" to Quit the program\n")
         inp = input("Your choice: ").lower()
 
         if inp == "y":  # user exits and enters another order
@@ -798,7 +795,15 @@ def get_order_input(menu_file):  # Validates Order
         print("\nE.g. \"6,4,4,7,8,10,10\""
               " Would be an order from Table 6 for 2 Burgers, 1 Fries, 1 Salad and 2 Soft"
               " Drinks.")
-        data = input("\nType order here: ").split(",")
+        tmpData = input("\nType order here: ").split(",")
+
+        # Removes spaces from each element in tmpData,
+        # then adds elements to 'data'
+        data = []
+        for string in tmpData:  # Iterates over each value
+            string = ''.join(string.split())  # Removes spaces from data
+            data.append(string)
+
         tmp_last_item = menu_file[len(menu_file) -  1]  # Assigns Last entry's index
         last_item = tmp_last_item[0]                    # to "last_item"
         invalid = ""
@@ -834,9 +839,10 @@ def main_menu(menu_file):   # Credits to github.com/RoyceLWC for Menu.
         print("\n----------Main Menu-----------")
         menu = {
             "1": [": Input order data", get_order_input],
-            "2": [": Change Menu Items", editing_main_menu],
-            "3": [": Options", options],
-            "4": [": Finalize Order", finalize_order]
+            "2": [": Edit Menu Items", editing_main_menu],
+            "3": [": Finalize Order", finalize_order],
+            "4": [": Options", options],
+            "5": [": Quit to Desktop"]
         }
 
         # Prints each menu index and its corresponding functions description
@@ -848,7 +854,7 @@ def main_menu(menu_file):   # Credits to github.com/RoyceLWC for Menu.
             index = input("Select an index: ")
             try:  # Try to convert to an integer
                 index = int(index)  # Converts to an integer
-                if 1 <= index <= 4:  # In range
+                if 1 <= index <= 5:  # In range
                     break
                 else:  # Out of range
                     print("Out of range try again!")
@@ -859,13 +865,15 @@ def main_menu(menu_file):   # Credits to github.com/RoyceLWC for Menu.
         if index == 1:  # Get all data about the order, e.g. price, quantity and table num.
             total_price, total_quantity, quantity_dict, table_num = menu[str(index)][1](menu_file)
             hasData = True
-        elif index == 2 or index == 3:  # change_menu_items
+        elif index == 2 or index == 4:  # change_menu_items or options()
             menu_file = menu[str(index)][1](menu_file)
-        else:  # finalize_order()
+        elif index == 3:  # finalize_order()
             if not hasData:  # No order data
                 print("No current order! Go back and Input an order.")
             else:
                 total_price, total_quantity, quantity_dict, table_num, hasData = menu[str(index)][1](total_price, total_quantity, quantity_dict, table_num, hasData)
+        else:  # quitProgram() | Stop the program and exit
+            quit()
 
 
 def check_file(DEFAULT_MENU):  # Checks for menu and Creates DEFAULT_MENU if doesn't exist.
