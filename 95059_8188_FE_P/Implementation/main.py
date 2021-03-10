@@ -608,8 +608,6 @@ def write_order(total_price, total_quantity, quantity_dict, table_num):
     with open("running_totals.txt", "w") as file:  # Creates the file and writes default menu
         file.write(f"{total_price}\n")
         file.write(f"{total_quantity}\n")
-        # file.write(f"{quantity_dict}\n")
-        # file.write(f"{table_num}")
 
 
 # Displays the current order with the quantities of each menu item.
@@ -862,17 +860,17 @@ def main_menu(menu_file):   # Credits to github.com/RoyceLWC for Menu.
                 print("Invalid index")
         data = ""
         print("-" * 30)
-        if index == 1:  # Get all data about the order, e.g. price, quantity and table num.
+        if index == 1:  # get_order_input() | Get all data about the order, e.g. price, quantity and table num.
             total_price, total_quantity, quantity_dict, table_num = menu[str(index)][1](menu_file)
             hasData = True
-        elif index == 2 or index == 4:  # change_menu_items or options()
+        elif index == 2 or index == 4:  # editing_main_menu or options()
             menu_file = menu[str(index)][1](menu_file)
         elif index == 3:  # finalize_order()
             if not hasData:  # No order data
                 print("No current order! Go back and Input an order.")
             else:
                 total_price, total_quantity, quantity_dict, table_num, hasData = menu[str(index)][1](total_price, total_quantity, quantity_dict, table_num, hasData)
-        else:  # quitProgram() | Stop the program and exit
+        else:
             quit()
 
 
