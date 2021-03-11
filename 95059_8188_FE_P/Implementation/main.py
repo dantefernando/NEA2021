@@ -737,7 +737,6 @@ def print_menu(menu_file, **kwargs):
 
     # Formats categories with separators for menu
     all_keys = []
-    # all_keys_unformatted = []
     separator = "~"  # Define the separator for printing
     if start_line == None:  # No **kwargs provided
         for key in category_dict.keys():  # Iterates over each category
