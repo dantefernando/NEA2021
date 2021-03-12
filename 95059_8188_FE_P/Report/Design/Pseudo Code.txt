@@ -1,5 +1,4 @@
 # PSEUDO CODE FOR TIMS DINER PROGRAM
-# github.com/dantefernando/NEA2021
 
 
 # DEFAULT_MENU is used in check_file() upon running program for first time.
@@ -65,7 +64,7 @@ BEGIN FUNCTION
     WHILE True DO  # Validates user input choice
         TRY DO
             SEND "Your choice: " TO DISPLAY
-            RECEIVE inp FROM keyboard (integer)
+            RECEIVE inp FROM keyboard (INTEGER)
             IF inp = 1 THEN  # inp=1 | User attempts reset of file
                 SEND "Are you sure you want to reset the Menu Items File? (menu.txt)?\n"
                       "This will erase all saved changes to the file and reset it to\n"
@@ -136,12 +135,12 @@ BEGIN FUNCTION
         TRY DO
             SEND "Your choice: " TO DISPLAY
             RECEIVE inp FROM (string) keyboard
-            SET delete_index TO int(inp)
+            SET delete_index TO INTEGER(inp)
 
             # Assigns Last entry's index to "last_item"
             SET name TO menu_file[delete_index-1][2]
             SET tmp_last_item TO menu_file[len(menu_file) - 1]
-            SET last_item_index TO int(tmp_last_item[0])
+            SET last_item_index TO INTEGER(tmp_last_item[0])
             IF delete_index > last_item_index OR delete_index < 1 DO  # Out of range
                 SEND f"Your delete index must be between: 1 and {last_item_index}\n"
                       "Please try again...\n" TO DISPLAY
@@ -222,11 +221,11 @@ BEGIN FUNCTION
             TRY DO
                 SEND "Your choice: " TO DISPLAY
                 RECEIVE inp FROM (string) keyboard
-                SET edit_index TO int(inp)
+                SET edit_index TO INTEGER(inp)
 
                 # Assigns Last entry's index to "last_item"
                 SET tmp_last_item TO menu_file[len(menu_file) - 1]
-                SET last_item_index TO int(tmp_last_item[0])
+                SET last_item_index TO INTEGER(tmp_last_item[0])
                 IF edit_index > last_item_index OR edit_index < 1 DO  # Out of range
                     SEND f"Your index must be between: 1 and {last_item_index}\n"
                           "Please try again...\n" TO DISPLAY
@@ -277,10 +276,10 @@ BEGIN FUNCTION
                 WHILE True DO  # Validates input for inputting index to change to 
                     TRY DO
                         SEND "Index Number: " TO DISPLAY
-                        RECEIVE inp FROM (integer) keyboard
+                        RECEIVE inp FROM (INTEGER) keyboard
                         # Assigns Last entry's index to "last_item"
                         SET tmp_last_item TO menu_file[len(menu_file) - 1]
-                        SET last_item_index TO int(tmp_last_item[0])
+                        SET last_item_index TO INTEGER(tmp_last_item[0])
                         IF inp > last_item_index or inp < 1 DO  # Out of range
                             PRINT f"Your index must be between: 1 and {last_item_index}\n"
                                   "Please try again...\n" TO DISPLAY
@@ -405,7 +404,7 @@ BEGIN FUNCTION
                     SET categories_present_index TO []
                     FOR EACH index, category_tmp IN enumerate(categories_in_file) DO
                         IF category_tmp = new_category THEN
-                            categories_present_index.append(int(index+1))
+                            categories_present_index.append(INTEGER(index+1))
                         ENDIF
 
                     SET start_line TO min(categories_present_index)  # Assigns min index value
@@ -424,7 +423,7 @@ BEGIN FUNCTION
                     WHILE True DO  # Validation Check of menu item index number
                         TRY DO
                             SEND "Your new menu item index: " TO DISPLAY
-                            RECEIVE new_index FROM (integer) keyboard
+                            RECEIVE new_index FROM (INTEGER) keyboard
                             IF new_index < start_line or new_index > final_line DO   # Out of range
                                 SEND f"Please enter a value between {start_line} and {final_line}.\n" TO DISPLAY
                             ELSE
@@ -548,7 +547,7 @@ BEGIN FUNCTION
         SET categories_present_index TO []
         FOR EACH index, category_tmp IN enumerate(categories_in_file) DO
             IF category_tmp = category THEN
-                categories_present_index.append(int(index+1))
+                categories_present_index.append(INTEGER(index+1))
             ENDIF
         END FOR
 
@@ -566,7 +565,7 @@ BEGIN FUNCTION
         WHILE True DO  # Validation Check of menu item index number
             TRY DO
                 SEND "your new menu item index: " TO DISPLAY
-                RECEIVE new_index FROM (integer) keyboard
+                RECEIVE new_index FROM (INTEGER) keyboard
                 IF new_index < start_line or new_index > final_line DO   # Out of range
                     SEND f"Please enter a value between {start_line} and {final_line}.\n" TO DISPLAY
                 ELSE
@@ -585,7 +584,7 @@ BEGIN FUNCTION
         # Adds 1 to the existing menu items' indexes
         FOR EACH index, el in enumerate(temp_menu_file, start=1) DO
             IF index > new_index THEN
-                SET el_index TO int(el[0])
+                SET el_index TO INTEGER(el[0])
                 SET el_index TO el_index + 1
                 SET el[0] TO str(el_index)
         END FOR
@@ -620,7 +619,7 @@ BEGIN FUNCTION
         ELIF choice = "r" DO  # Retry without saving changes (R)
             FOR EACH index, el IN enumerate(temp_menu_file, start=1) DO
                 IF index > new_index DO
-                    SET el_index TO int(el[0])
+                    SET el_index TO INTEGER(el[0])
                     SET el_index TO el_index - 1
                     SET el[0] TO str(el_index)
                 ENDIF
@@ -630,7 +629,7 @@ BEGIN FUNCTION
         ELSE  # Exits without saving changes (D)
             FOR EACH index, el in enumerate(temp_menu_file, start=1) DO
                 IF index > new_index DO
-                    SET el_index TO int(el[0])
+                    SET el_index TO INTEGER(el[0])
                     SET el_index TO el_index - 1
                     SET el[0] TO str(el_index)
                 ENDIF
@@ -672,7 +671,7 @@ BEGIN FUNCTION
             SEND "Select an index: " TO DISPLAY
             RECEIVE index FROM (string) keyboard
             TRY DO  # Try to convert to an integer
-                SET index TO int(index)  # Converts to an integer
+                SET index TO INTEGER(index)  # Converts to an integer
                 IF 1 <= index <= 4 DO  # In range
                     BREAK
                 ELSE  # Out of range
@@ -946,13 +945,13 @@ BEGIN FUNCTION
             IF index = 0 THEN  # If the element is first (table number doesn't apply for these rules)
                 IF element.isnumeric() = False DO  # If first element in data is NOT numeric:
                     SET invalid TO True
-                ELIF int(element) > 10 DO  # If the element is numerically greater than number of tables in (10)
+                ELIF INTEGER(element) > 10 DO  # If the element is numerically greater than number of tables in (10)
                     SET invalidTable TO True
                 ENDIF
             ELSE IF
                 IF len(element) > len(last_item) or element.isnumeric() == False DO
                     SET invalid TO True  # ^If the digit length is greater than the digit length in the menu or is not integer
-                ELIF int(element) > int(last_item) DO  # If the element is numerically greater than the last item
+                ELIF INTEGER(element) > INTEGER(last_item) DO  # If the element is numerically greater than the last item
                     SET invalid TO True
                 ENDIF
             ENDIF
@@ -998,7 +997,7 @@ BEGIN PROCEDURE
             SEND "Select an index: " TO DISPLAY 
             RECEIVE index FROM (string) keyboard
             TRY DO  # Try to convert to an integer
-                SET index TO int(index)  # Converts to an integer
+                SET index TO INTEGER(index)  # Converts to an integer
                 IF 1 <= index <= 5 DO  # In range
                     BREAK
                 ELSE  # Out of range
