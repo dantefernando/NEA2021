@@ -10,12 +10,6 @@ TODO LIST:
 
 - Add confirmation when renaming the categories for edit_menu_items()
 
---------------------------------------------------
-
-~Extras (not required for GCSE NEA but still important)~
-
-- Remove Royce's menu stuff and program ur own because ur not retarded. | main_menu() and editing_main_menu()
-
 """
 
 # DEFAULT_MENU is used in check_file() upon running program for first time.
