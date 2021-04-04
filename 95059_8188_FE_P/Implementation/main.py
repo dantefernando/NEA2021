@@ -123,50 +123,59 @@ def delete_menu_items(menu_file):
         print("Enter a menu item index to delete\n"
               "Or type \"E\" to exit.\n")
 
-        try:
-            inp = input("Your choice: ")
-            delete_index = int(inp)
+        while True:  # Checks if user input is in range for deletion or if the user wants to exit "delete_menu_items"
+            try:
+                inp = input("Your choice: ")
+                int_inp = int(inp)  # Converts to type: integer
 
-            # Assigns Last entry's index to "last_item"
-            name = menu_file[delete_index-1][2]
-            tmp_last_item = menu_file[len(menu_file) - 1]
-            last_item_index = int(tmp_last_item[0])
-            if delete_index > last_item_index or delete_index < 1:  # Out of range
-                print(f"Your delete index must be between: 1 and {last_item_index}\n"
-                      "Please try again...\n")
-            else:  # Index is valid
-                print(f"Are you sure you want to delete {name}?\n"
-                      "- Enter \"Y\" to Confirm Menu Item Deletion\n"
-                      "- Enter \"N\" to Discard Changes and Exit to Edit Menu\n")
-
-                while True:  # Validates input for delete item or Exit
-                    choiceInp = input("Your choice: ").lower()
-
-                    if choiceInp == "y":  # User wants to delete the menu item
-                        # Deletes the menu item
-                        del menu_file[delete_index-1]
-
-                        # Corrects menu index numbers in the list 
-                        for index, full_item in enumerate(menu_file, start=1):
-                            full_item[0] = str(index)
-
-                        print(f"{name} Deleted!")
-                        break
-
-                    elif choiceInp == "n":  # User wants to exit 
-                        break
-                    else:
-                        print("Please enter \"y\" or \"n\" as your choice, try again.\n")
-
-                if choiceInp == "n":  # User exits instead of deleting menu item
-                    print("Exiting...\n")
+                tmp_last_item = menu_file[len(menu_file) - 1]
+                last_item_index = int(tmp_last_item[0])
+                delete_index = int_inp
+                if delete_index > last_item_index or delete_index < 1:  # Out of range
+                    print(f"Your delete index must be between: 1 and {last_item_index}\n"
+                          "Please try again...\n")
+                else:
                     break
+            except ValueError:  # Input is not an integer
+                if inp == "e":
+                    break
+                else:
+                    print("Please enter numeric characters only, try again\n")
 
-        except ValueError:  # User entered input other than an integer
-            if inp == "e":
+        if inp == "e":
+            break
+
+        # Assigns Last entry's index to "last_item"
+        name = menu_file[delete_index-1][2]
+
+        print(f"Are you sure you want to delete {name}?\n"
+              "- Enter \"Y\" to Confirm Menu Item Deletion\n"
+              "- Enter \"N\" to Discard Changes and Exit to Edit Menu\n")
+
+        while True:  # Validates input for delete item or Exit
+            choiceInp = input("Your choice: ").lower()
+
+            if choiceInp == "y":  # User wants to delete the menu item
+                # Deletes the menu item
+                del menu_file[delete_index-1]
+
+                # Corrects menu index numbers in the list 
+                for index, full_item in enumerate(menu_file, start=1):
+                    full_item[0] = str(index)
+
+                print(f"{name} Deleted!")
+                break
+
+            elif choiceInp == "n":  # User wants to exit 
                 break
             else:
-                print("Please enter numeric characters only, try again.\n")
+                print("Please enter \"y\" or \"n\" as your choice, try again.\n")
+
+        if choiceInp == "n":  # User exits instead of deleting menu item
+            print("Exiting...\n")
+            break
+
+
     return menu_file
 
 
