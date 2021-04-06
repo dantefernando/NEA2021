@@ -58,7 +58,7 @@ def finalize_order(total_price, total_quantity, quantity_dict, table_num, hasDat
             quit()
 
         else:  # User input is invalid 
-            print("Please enter \"y\" or \"n\" as your choice, try again.\n")
+            print("Please enter \"y\", \"n\" or \"q\"as your choice, try again.\n")
 
 
 
