@@ -28,6 +28,8 @@ DEFAULT_MENU = ("1,5.50,All day (large),breakfast",
                 "12,0.90,Sparkling water,drinks")
 
 
+# Finalizes the order by displaying the current ordered meal with prices
+# and the quantities of each item
 def finalize_order(total_price, total_quantity, quantity_dict, table_num, hasData):
     print("\n######## BEGIN PRINTING ########\n")
     print("TIMS DINER\n")
@@ -183,6 +185,7 @@ def delete_menu_items(menu_file):
         return menu_file
 
 
+# Writes to the menu file the current menu_file list of items
 def write_menu(menu_file):
     with open("menu.txt", "w") as file:  # Creates the file and writes menu_file
         for line in menu_file:  # Iterates over each full item in menu item
@@ -788,7 +791,7 @@ def print_menu(menu_file, **kwargs):
     print("\n")
 
 
-def get_order_input(menu_file):  # Validates Order
+def get_order_input(menu_file):  # Validates Order Input from user
     print_menu(menu_file)
     while True:
         print("-" * 30)
