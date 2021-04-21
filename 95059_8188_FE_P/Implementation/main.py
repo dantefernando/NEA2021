@@ -809,13 +809,13 @@ def get_order_input(menu_file):  # Validates Order Input from user
 
         tmp_last_item = menu_file[len(menu_file) -  1]  # Assigns Last entry's index
         last_item = tmp_last_item[0]                    # to "last_item"
-        invalid = ""
-        invalidTable = ""
+        invalid = None
+        invalidTable = None
         for index, element in enumerate(data):  # Takes each element in the array
             if index == 0:  # If the element is first (table number doesn't apply for these rules)
                 if element.isnumeric() == False:  # If first element in data is NOT numeric:
                     invalid = True
-                elif int(element) > 10:  # If the element is numerically greater than number of tables in (10)
+                elif not 0 < int(element) <= 10:  # If the element is not numerically more than 0 and greater than number of tables (10)
                     invalidTable = True
             else:
                 if len(element) > len(last_item) or element.isnumeric() == False:
@@ -823,7 +823,7 @@ def get_order_input(menu_file):  # Validates Order Input from user
                 elif int(element) > int(last_item):  # If the element is numerically greater than the last item
                     invalid = True
         if invalidTable:
-            print("\nWe only have 10 tables! Table number must be lower than 10, please try again.")
+            print("\nWe only have 10 tables! Table number must be at least 1 and not more than 10, please try again.")
         elif invalid:  # If there are letters or symbols in the input: 
             print("\nYour order has invalid characters, please try again.")
         elif len(data) == 1:
