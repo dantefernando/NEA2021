@@ -2,16 +2,6 @@
 # https://github.com/dantefernando/NEA2021
 
 
-"""
-
-TODO LIST:
-
-~Order Section~
-
-- Add confirmation when renaming the categories for edit_menu_items()
-
-"""
-
 # DEFAULT_MENU is used in check_file() upon running program for first time.
 
 DEFAULT_MENU = ("1,5.50,All day (large),breakfast",
