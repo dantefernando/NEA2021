@@ -8,8 +8,8 @@ Sources Used
 2. https://stackoverflow.com/questions/22524635/can-you-define-a-variable-inside-an-if-statement
 - 11th Feb 2020
 
-https://www.w3schools.com/python/ref_string_strip.asp
+3. https://www.w3schools.com/python/ref_string_strip.asp
 - 11th Feb 2020
 
-https://stackoverflow.com/questions/23240969/python-count-repeated-elements-in-the-list
+4. https://stackoverflow.com/questions/23240969/python-count-repeated-elements-in-the-list
 - 12th Feb 2020
